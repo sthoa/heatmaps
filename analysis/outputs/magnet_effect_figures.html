@@ -1,0 +1,177 @@
+<title>Aug 27 Magnet Effect</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --baseline:#c3c2b7; --mag:#2a78d6; --mag-soft:rgba(42,120,214,.14);
+  --ctrl:#52514e; --ctrl-soft:rgba(82,81,78,.12); --ring:rgba(11,11,11,.10);
+  --accent:#1E7A5A;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page:#0d0d0d; --surface:#1a1a19; --ink:#ffffff; --ink2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --baseline:#383835; --mag:#3987e5; --mag-soft:rgba(57,135,229,.20);
+    --ctrl:#c3c2b7; --ctrl-soft:rgba(195,194,183,.14); --ring:rgba(255,255,255,.10);
+    --accent:#4CC094;
+  }
+}
+:root[data-theme="dark"] {
+  --page:#0d0d0d; --surface:#1a1a19; --ink:#ffffff; --ink2:#c3c2b7; --muted:#898781;
+  --grid:#2c2c2a; --baseline:#383835; --mag:#3987e5; --mag-soft:rgba(57,135,229,.20);
+  --ctrl:#c3c2b7; --ctrl-soft:rgba(195,194,183,.14); --ring:rgba(255,255,255,.10);
+  --accent:#4CC094;
+}
+body { background:var(--page); color:var(--ink); margin:0; padding:32px 20px 90px;
+  font:14px/1.55 "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width:1100px; margin:0 auto; }
+h1 { font-size:25px; font-weight:600; margin:0 0 4px; text-wrap:balance; }
+.sub { color:var(--ink2); margin:0 0 22px; max-width:68ch; }
+h2 { font-size:14px; font-weight:600; letter-spacing:.05em; text-transform:uppercase;
+  color:var(--accent); margin:38px 0 4px; }
+.note { color:var(--ink2); font-size:13px; margin:0 0 14px; max-width:75ch; }
+.tiles { display:flex; gap:14px; flex-wrap:wrap; margin:18px 0 6px; }
+.tile { background:var(--surface); border:1px solid var(--ring); border-radius:8px;
+  padding:14px 20px; min-width:200px; }
+.tile b { display:block; font-size:26px; font-weight:600; line-height:1.15; }
+.tile span { color:var(--ink2); font-size:12.5px; }
+.legend { display:flex; gap:20px; align-items:center; margin:10px 0 6px; font-size:12.5px; color:var(--ink2); }
+.legend .sw { display:inline-block; width:22px; height:0; border-top:3px solid var(--mag);
+  border-radius:2px; vertical-align:middle; margin-right:6px; }
+.legend .swc { border-top:3px dashed var(--ctrl); }
+.grid8 { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+@media (max-width:980px){ .grid8{grid-template-columns:repeat(2,1fr);} }
+.panel { background:var(--surface); border:1px solid var(--ring); border-radius:8px; padding:8px 8px 2px; }
+.panel h3 { font:500 12px "IBM Plex Mono", monospace; margin:2px 0 0 6px; color:var(--ink); }
+.panel .cap { font-size:11px; color:var(--muted); margin:0 0 2px 6px; }
+svg text { font-family:"IBM Plex Sans", system-ui, sans-serif; }
+.wide { background:var(--surface); border:1px solid var(--ring); border-radius:8px; padding:12px; overflow-x:auto; }
+#tip { position:fixed; pointer-events:none; background:var(--surface); color:var(--ink);
+  border:1px solid var(--ring); box-shadow:0 2px 10px rgba(0,0,0,.18); border-radius:6px;
+  padding:6px 10px; font:12px "IBM Plex Mono", monospace; z-index:9; white-space:pre; }
+details.tbl { margin-top:14px; background:var(--surface); border:1px solid var(--ring); border-radius:8px; padding:10px 16px; }
+details.tbl summary { cursor:pointer; font-weight:600; }
+table { border-collapse:collapse; font:12.5px "IBM Plex Mono", monospace; margin-top:10px; }
+th,td { padding:4px 12px; text-align:right; border-bottom:1px solid var(--grid); font-variant-numeric:tabular-nums; }
+th:first-child, td:first-child { text-align:left; }
+.meth { max-width:78ch; color:var(--ink2); font-size:13px; }
+.meth li { margin:6px 0; }
+</style>
+<main>
+<h1>Aug 27 Magnet Effect</h1>
+<p class="sub">Penetration of magnetic nanoparticles from the injection gap into a 10&thinsp;mm agarose block over 21.5&thinsp;h (back injection, large magnet), measured as the depth of the visible NP band in top-view photos. Three repeats per arm; controls are identical blocks without a magnet.</p>
+
+<div class="tiles" id="tiles"></div>
+
+<h2>Band depth over time</h2>
+<p class="note">Mean of 3 repeats, shaded &plusmn;1&thinsp;sd. Controls spread quickly (~first hour) and then plateau; magnet arms keep advancing through 21.5&thinsp;h.</p>
+<div class="legend"><span><span class="sw"></span>magnet</span><span><span class="sw swc"></span>control (no magnet)</span></div>
+<div class="grid8" id="panels"></div>
+
+<h2>Depth at 21.5 h</h2>
+<p class="note">Dots are individual repeats; bars mark the mean. Right: the paired magnet&thinsp;&minus;&thinsp;control difference per condition.</p>
+<div class="wide" id="finalrow"></div>
+
+<h2>Methods &amp; limits</h2>
+<ul class="meth">
+<li><b>Band depth</b>: photos were perspective-corrected to the 10&times;10&thinsp;mm block, intensity-normalized against the white holder in each frame, and the NP band measured as the furthest point (from the gap edge) where darkening exceeds the block&rsquo;s own base tint by 15&thinsp;L*.</li>
+<li><b>What is resolvable</b>: the high-contrast band near the gap. A diffuse interior tint attributable to the magnet could not be separated from imaging noise &mdash; phone auto-exposure varies &plusmn;30&thinsp;L* between shots, the magnet casts a shadow on its side of the block, and ambient light drifted over the 21.5&thinsp;h run.</li>
+<li><b>Wall arrival (magnet arms)</b>: after removing the magnets, a dark NP patch is visible by eye at the block wall on the magnet side. Consistent with this, the wall-interface zone in magnet-arm photos darkens progressively (&minus;9&thinsp;L* at 1&thinsp;h &rarr; &minus;26&thinsp;L* at 21.5&thinsp;h vs the same block at t&thinsp;=&thinsp;0 with magnet attached), while the gap zone depletes faster than in controls &mdash; NPs crossed to the wall, likely via the agarose&ndash;case interface / block bottom, alongside the slow bulk band (&le;4&thinsp;mm). Caveat: the magnet&rsquo;s shadow occupies the same pixels and responds to the large ambient-light changes over the run (day&ndash;night&ndash;day), so the deposit cannot be quantified per condition from these images; a dense deposit reads near-black (not brown), so color cannot separate the two either.</li>
+<li><b>Statistics</b>: paired across the 8 conditions, the magnet adds on average <b>+0.44&thinsp;mm</b> at 21.5&thinsp;h (t&thinsp;=&thinsp;2.66, 7/8 conditions positive). Differences between coatings, BSA, and agarose concentrations are within repeat-level noise.</li>
+<li><b>To quantify the wall deposit</b>: photograph all blocks magnet-off (top and side views) at the end of a run &mdash; the pipeline can then measure far-wall accumulation per condition without occlusion.</li>
+<li><b>For the next run</b>: lock exposure/white balance (Pro mode), fix the phone on a mount, keep a gray card in frame, and consider a destructive endpoint (gel sectioning + ICP or UV-Vis) to quantify interior NP content that top-view color cannot see.</li>
+</ul>
+
+<details class="tbl"><summary>Data table (depth at 21.5 h, mm)</summary><div id="tblwrap"></div></details>
+</main>
+<script>
+const DATA = {"conditions": ["0.4|BSA|COOH", "0.4|BSA|PEG", "0.4|non-BSA|COOH", "0.4|non-BSA|PEG", "0.6|BSA|COOH", "0.6|BSA|PEG", "0.6|non-BSA|COOH", "0.6|non-BSA|PEG"], "curves": {"0.4|BSA|COOH": {"control": [{"t": 0.0, "mean": 1.938, "sd": 1.679, "reps": [2.942, 0.0, 2.873]}, {"t": 1.0, "mean": 2.369, "sd": 0.321, "reps": [2.231, 2.735, 2.14]}, {"t": 2.0, "mean": 2.017, "sd": 0.434, "reps": [1.521, 2.208, 2.323]}, {"t": 3.0, "mean": 2.033, "sd": 0.394, "reps": [1.59, 2.346, 2.163]}, {"t": 4.0, "mean": 2.163, "sd": 0.451, "reps": [2.094, 2.644, 1.75]}, {"t": 5.0, "mean": 1.857, "sd": 0.243, "reps": [1.635, 2.117, 1.819]}, {"t": 6.0, "mean": 1.513, "sd": 0.358, "reps": [1.131, 1.842, 1.567]}, {"t": 7.5, "mean": 1.528, "sd": 0.402, "reps": [1.567, 1.91, 1.108]}, {"t": 9.0, "mean": 1.903, "sd": 0.447, "reps": [1.59, 2.415, 1.704]}, {"t": 10.5, "mean": 3.125, "sd": 2.462, "reps": [1.773, 1.635, 5.967]}, {"t": 12.0, "mean": 4.638, "sd": 2.481, "reps": [1.773, 6.081, 6.058]}, {"t": 21.5, "mean": 2.644, "sd": 0.681, "reps": [2.163, 3.125]}], "magnet": [{"t": 0.0, "mean": 2.034, "sd": 1.767, "reps": [0.0, 2.907, 3.194]}, {"t": 1.0, "mean": 1.528, "sd": 1.274, "reps": [2.46, 2.048, 0.077]}, {"t": 2.0, "mean": 2.369, "sd": 0.3, "reps": [2.575, 2.025, 2.506]}, {"t": 3.0, "mean": 2.659, "sd": 0.103, "reps": [2.667, 2.758, 2.552]}, {"t": 4.0, "mean": 2.376, "sd": 0.452, "reps": [2.071, 2.163, 2.896]}, {"t": 5.0, "mean": 1.918, "sd": 1.182, "reps": [0.604, 2.254, 2.896]}, {"t": 6.0, "mean": 2.231, "sd": 0.956, "reps": [1.223, 2.346, 3.125]}, {"t": 7.5, "mean": 2.972, "sd": 0.566, "reps": [2.346, 3.125, 3.446]}, {"t": 9.0, "mean": 3.178, "sd": 0.448, "reps": [3.056, 2.804, 3.675]}, {"t": 10.5, "mean": 3.102, "sd": 0.529, "reps": [3.056, 2.598, 3.652]}, {"t": 12.0, "mean": 3.087, "sd": 0.598, "reps": [2.575, 2.942, 3.744]}, {"t": 21.5, "mean": 3.224, "sd": 0.798, "reps": [2.346, 3.423, 3.904]}]}, "0.4|BSA|PEG": {"control": [{"t": 0.0, "mean": 1.189, "sd": 0.47, "reps": [0.856, 1.521]}, {"t": 1.0, "mean": 2.774, "sd": 0.195, "reps": [2.919, 2.552, 2.85]}, {"t": 2.0, "mean": 2.766, "sd": 0.652, "reps": [2.323, 2.46, 3.515]}, {"t": 3.0, "mean": 2.46, "sd": 0.27, "reps": [2.231, 2.392, 2.758]}, {"t": 4.0, "mean": 2.43, "sd": 0.241, "reps": [2.667, 2.185, 2.438]}, {"t": 5.0, "mean": 3.408, "sd": 1.507, "reps": [2.827, 2.277, 5.119]}, {"t": 6.0, "mean": 2.216, "sd": 0.69, "reps": [1.773, 3.01, 1.865]}, {"t": 7.5, "mean": 1.773, "sd": 0.139, "reps": [1.681, 1.704, 1.933]}, {"t": 9.0, "mean": 1.918, "sd": 0.163, "reps": [2.094, 1.773, 1.887]}, {"t": 10.5, "mean": 2.04, "sd": 0.058, "reps": [2.048, 2.094, 1.979]}, {"t": 12.0, "mean": 1.964, "sd": 0.108, "reps": [2.048, 1.842, 2.002]}, {"t": 21.5, "mean": 2.453, "sd": 0.213, "reps": [2.392, 2.69, 2.277]}], "magnet": [{"t": 0.0, "mean": 1.274, "sd": 1.391, "reps": [1.062, 2.758, 0.0]}, {"t": 1.0, "mean": 2.201, "sd": 1.141, "reps": [0.925, 3.125, 2.552]}, {"t": 2.0, "mean": 2.46, "sd": 0.463, "reps": [2.277, 2.987, 2.117]}, {"t": 3.0, "mean": 2.552, "sd": 0.338, "reps": [2.369, 2.346, 2.942]}, {"t": 4.0, "mean": 3.064, "sd": 0.288, "reps": [3.331, 3.102, 2.758]}, {"t": 5.0, "mean": 3.293, "sd": 0.093, "reps": [3.377, 3.194, 3.308]}, {"t": 6.0, "mean": 2.262, "sd": 0.612, "reps": [2.827, 2.346, 1.612]}, {"t": 7.5, "mean": 2.468, "sd": 1.204, "reps": [3.652, 2.506, 1.246]}, {"t": 9.0, "mean": 3.262, "sd": 0.226, "reps": [3.515, 3.194, 3.079]}, {"t": 10.5, "mean": 3.415, "sd": 0.355, "reps": [3.767, 3.423, 3.056]}, {"t": 12.0, "mean": 3.538, "sd": 0.793, "reps": [4.362, 3.469, 2.781]}, {"t": 21.5, "mean": 3.667, "sd": 0.187, "reps": [3.881, 3.583, 3.537]}]}, "0.4|non-BSA|COOH": {"control": [{"t": 0.0, "mean": 2.965, "sd": 0.754, "reps": [2.529, 2.529, 3.835]}, {"t": 1.0, "mean": 3.545, "sd": 0.544, "reps": [3.904, 2.919, 3.812]}, {"t": 2.0, "mean": 3.423, "sd": 0.418, "reps": [3.148, 3.904, 3.217]}, {"t": 3.0, "mean": 4.149, "sd": 1.315, "reps": [2.644, 5.073, 4.729]}, {"t": 4.0, "mean": 4.202, "sd": 1.344, "reps": [2.667, 5.165, 4.775]}, {"t": 5.0, "mean": 4.194, "sd": 1.011, "reps": [3.148, 5.165, 4.271]}, {"t": 6.0, "mean": 4.294, "sd": 1.23, "reps": [2.896, 5.21, 4.775]}, {"t": 7.5, "mean": 4.462, "sd": 1.006, "reps": [3.331, 5.256, 4.798]}, {"t": 9.0, "mean": 4.256, "sd": 1.313, "reps": [2.758, 5.21, 4.798]}, {"t": 10.5, "mean": 4.217, "sd": 1.16, "reps": [3.01, 5.325, 4.317]}, {"t": 12.0, "mean": 4.072, "sd": 1.181, "reps": [2.873, 5.233, 4.11]}, {"t": 21.5, "mean": 4.24, "sd": 1.041, "reps": [3.125, 5.188, 4.408]}], "magnet": [{"t": 0.0, "mean": 2.884, "sd": 0.353, "reps": [3.022, 3.148, 2.483]}, {"t": 1.0, "mean": 1.75, "sd": 1.373, "reps": [2.438, 0.169, 2.644]}, {"t": 2.0, "mean": 2.827, "sd": 0.353, "reps": [2.529, 3.217, 2.735]}, {"t": 3.0, "mean": 2.972, "sd": 0.347, "reps": [2.575, 3.125, 3.217]}, {"t": 4.0, "mean": 3.14, "sd": 0.395, "reps": [2.712, 3.492, 3.217]}, {"t": 5.0, "mean": 3.79, "sd": 0.023, "reps": [3.767, 3.79, 3.812]}, {"t": 6.0, "mean": 3.308, "sd": 0.143, "reps": [3.194, 3.469, 3.263]}, {"t": 7.5, "mean": 3.606, "sd": 0.392, "reps": [4.019, 3.56, 3.24]}, {"t": 9.0, "mean": 3.706, "sd": 0.39, "reps": [4.11, 3.675, 3.331]}, {"t": 10.5, "mean": 4.431, "sd": 0.204, "reps": [4.202, 4.5, 4.592]}, {"t": 12.0, "mean": 3.912, "sd": 0.153, "reps": [3.744, 4.042, 3.95]}, {"t": 21.5, "mean": 3.973, "sd": 0.258, "reps": [3.812, 3.835, 4.271]}]}, "0.4|non-BSA|PEG": {"control": [{"t": 0.0, "mean": 2.43, "sd": 0.7, "reps": [2.277, 3.194, 1.819]}, {"t": 1.0, "mean": 2.315, "sd": 1.278, "reps": [2.85, 0.856, 3.24]}, {"t": 2.0, "mean": 3.232, "sd": 0.513, "reps": [2.781, 3.125, 3.79]}, {"t": 3.0, "mean": 2.598, "sd": 1.68, "reps": [2.781, 0.833, 4.179]}, {"t": 4.0, "mean": 3.171, "sd": 1.129, "reps": [2.117, 3.033, 4.362]}, {"t": 5.0, "mean": 3.515, "sd": 0.791, "reps": [2.735, 3.492, 4.317]}, {"t": 6.0, "mean": 2.728, "sd": 0.988, "reps": [1.612, 3.079, 3.492]}, {"t": 7.5, "mean": 2.04, "sd": 1.188, "reps": [1.796, 0.994, 3.331]}, {"t": 9.0, "mean": 3.453, "sd": 0.472, "reps": [2.919, 3.629, 3.812]}, {"t": 10.5, "mean": 3.11, "sd": 0.175, "reps": [2.919, 3.148, 3.263]}, {"t": 12.0, "mean": 2.72, "sd": 0.895, "reps": [1.75, 2.896, 3.515]}, {"t": 21.5, "mean": 2.804, "sd": 0.774, "reps": [2.094, 3.629, 2.69]}], "magnet": [{"t": 0.0, "mean": 2.777, "sd": 0.327, "reps": [2.804, 3.091, 2.438]}, {"t": 1.0, "mean": 2.827, "sd": 0.403, "reps": [2.987, 3.125, 2.369]}, {"t": 2.0, "mean": 2.361, "sd": 0.058, "reps": [2.415, 2.369, 2.3]}, {"t": 3.0, "mean": 2.743, "sd": 0.311, "reps": [3.102, 2.575, 2.552]}, {"t": 4.0, "mean": 2.827, "sd": 0.325, "reps": [3.194, 2.712, 2.575]}, {"t": 5.0, "mean": 2.865, "sd": 0.417, "reps": [3.331, 2.735, 2.529]}, {"t": 6.0, "mean": 2.972, "sd": 0.401, "reps": [3.377, 2.965, 2.575]}, {"t": 7.5, "mean": 3.049, "sd": 0.862, "reps": [3.95, 2.965, 2.231]}, {"t": 9.0, "mean": 3.316, "sd": 0.591, "reps": [3.973, 3.148, 2.827]}, {"t": 10.5, "mean": 3.217, "sd": 0.346, "reps": [3.537, 3.263, 2.85]}, {"t": 12.0, "mean": 3.201, "sd": 0.424, "reps": [3.629, 3.194, 2.781]}, {"t": 21.5, "mean": 3.415, "sd": 0.355, "reps": [3.056, 3.767, 3.423]}]}, "0.6|BSA|COOH": {"control": [{"t": 0.0, "mean": 2.98, "sd": 0.296, "reps": [2.735, 3.308, 2.896]}, {"t": 1.0, "mean": 3.476, "sd": 0.504, "reps": [2.965, 3.492, 3.973]}, {"t": 2.0, "mean": 2.491, "sd": 1.69, "reps": [0.65, 2.85, 3.973]}, {"t": 3.0, "mean": 3.163, "sd": 0.728, "reps": [2.323, 3.606, 3.56]}, {"t": 4.0, "mean": 3.698, "sd": 0.51, "reps": [3.24, 3.606, 4.248]}, {"t": 5.0, "mean": 3.423, "sd": 0.774, "reps": [2.598, 3.537, 4.133]}, {"t": 6.0, "mean": 3.201, "sd": 0.588, "reps": [2.552, 3.354, 3.698]}, {"t": 7.5, "mean": 3.194, "sd": 1.075, "reps": [2.048, 3.354, 4.179]}, {"t": 9.0, "mean": 3.11, "sd": 0.905, "reps": [2.415, 2.781, 4.133]}, {"t": 10.5, "mean": 3.392, "sd": 0.172, "reps": [3.217, 3.56, 3.4]}, {"t": 12.0, "mean": 2.728, "sd": 1.279, "reps": [2.071, 1.91, 4.202]}, {"t": 21.5, "mean": 3.117, "sd": 0.499, "reps": [2.712, 2.965, 3.675]}], "magnet": [{"t": 0.0, "mean": 2.25, "sd": 0.504, "reps": [1.796, 2.163, 2.793]}, {"t": 1.0, "mean": 2.071, "sd": 0.744, "reps": [2.277, 2.69, 1.246]}, {"t": 2.0, "mean": 2.247, "sd": 0.132, "reps": [2.323, 2.094, 2.323]}, {"t": 3.0, "mean": 2.529, "sd": 0.435, "reps": [2.415, 2.163, 3.01]}, {"t": 4.0, "mean": 2.208, "sd": 1.47, "reps": [3.125, 0.512, 2.987]}, {"t": 5.0, "mean": 2.636, "sd": 0.074, "reps": [2.69, 2.552, 2.667]}, {"t": 6.0, "mean": 2.606, "sd": 0.087, "reps": [2.506, 2.644, 2.667]}, {"t": 7.5, "mean": 2.743, "sd": 0.207, "reps": [2.529, 2.758, 2.942]}, {"t": 9.0, "mean": 2.999, "sd": 0.275, "reps": [2.804, 3.194]}, {"t": 10.5, "mean": 3.133, "sd": 0.531, "reps": [2.781, 2.873, 3.744]}, {"t": 12.0, "mean": 3.178, "sd": 0.619, "reps": [2.712, 2.942, 3.881]}, {"t": 21.5, "mean": 3.14, "sd": 0.303, "reps": [3.079, 2.873, 3.469]}]}, "0.6|BSA|PEG": {"control": [{"t": 0.0, "mean": 2.071, "sd": 1.002, "reps": [3.217, 1.36, 1.635]}, {"t": 1.0, "mean": 3.094, "sd": 0.668, "reps": [2.323, 3.469, 3.492]}, {"t": 2.0, "mean": 2.728, "sd": 0.138, "reps": [2.598, 2.712, 2.873]}, {"t": 3.0, "mean": 2.858, "sd": 0.426, "reps": [2.46, 2.804, 3.308]}, {"t": 4.0, "mean": 2.934, "sd": 0.309, "reps": [2.942, 2.621, 3.24]}, {"t": 5.0, "mean": 2.819, "sd": 0.426, "reps": [2.942, 2.346, 3.171]}, {"t": 6.0, "mean": 2.644, "sd": 0.308, "reps": [2.392, 2.987, 2.552]}, {"t": 7.5, "mean": 2.254, "sd": 0.179, "reps": [2.346, 2.048, 2.369]}, {"t": 9.0, "mean": 2.865, "sd": 0.388, "reps": [2.438, 2.965, 3.194]}, {"t": 10.5, "mean": 3.476, "sd": 2.299, "reps": [2.277, 2.025, 6.127]}, {"t": 12.0, "mean": 2.078, "sd": 0.404, "reps": [1.75, 2.529, 1.956]}, {"t": 21.5, "mean": 2.334, "sd": 0.697, "reps": [1.842, 2.827]}], "magnet": [{"t": 0.0, "mean": 2.967, "sd": 0.137, "reps": [2.896, 2.881, 3.125]}, {"t": 1.0, "mean": 2.697, "sd": 0.256, "reps": [2.598, 2.506, 2.987]}, {"t": 2.0, "mean": 2.575, "sd": 0.558, "reps": [2.208, 3.217, 2.3]}, {"t": 3.0, "mean": 2.606, "sd": 0.331, "reps": [2.415, 2.987, 2.415]}, {"t": 4.0, "mean": 1.719, "sd": 1.402, "reps": [2.529, 0.1, 2.529]}, {"t": 5.0, "mean": 2.17, "sd": 0.681, "reps": [1.406, 2.392, 2.712]}, {"t": 6.0, "mean": 2.552, "sd": 0.323, "reps": [2.598, 2.208, 2.85]}, {"t": 7.5, "mean": 2.835, "sd": 0.631, "reps": [2.185, 3.446, 2.873]}, {"t": 9.0, "mean": 3.094, "sd": 0.562, "reps": [2.758, 2.781, 3.744]}, {"t": 10.5, "mean": 3.347, "sd": 0.753, "reps": [3.148, 2.712, 4.179]}, {"t": 12.0, "mean": 2.873, "sd": 0.255, "reps": [2.644, 2.827, 3.148]}, {"t": 21.5, "mean": 3.171, "sd": 0.346, "reps": [3.492, 2.804, 3.217]}]}, "0.6|non-BSA|COOH": {"control": [{"t": 0.0, "mean": 2.651, "sd": 1.018, "reps": [3.033, 3.423, 1.498]}, {"t": 1.0, "mean": 3.408, "sd": 0.626, "reps": [3.583, 3.927, 2.712]}, {"t": 2.0, "mean": 3.69, "sd": 0.356, "reps": [3.583, 4.088, 3.4]}, {"t": 3.0, "mean": 3.858, "sd": 1.253, "reps": [3.629, 5.21, 2.735]}, {"t": 4.0, "mean": 4.011, "sd": 1.077, "reps": [3.698, 5.21, 3.125]}, {"t": 5.0, "mean": 3.614, "sd": 0.671, "reps": [3.285, 4.385, 3.171]}, {"t": 6.0, "mean": 3.507, "sd": 0.665, "reps": [3.194, 4.271, 3.056]}, {"t": 7.5, "mean": 3.583, "sd": 0.699, "reps": [3.263, 4.385, 3.102]}, {"t": 9.0, "mean": 3.369, "sd": 1.1, "reps": [3.056, 4.592, 2.46]}, {"t": 10.5, "mean": 3.622, "sd": 0.659, "reps": [3.4, 4.362, 3.102]}, {"t": 12.0, "mean": 3.499, "sd": 0.629, "reps": [3.171, 4.225, 3.102]}, {"t": 21.5, "mean": 3.476, "sd": 1.11, "reps": [3.308, 4.66, 2.46]}], "magnet": [{"t": 0.0, "mean": 2.812, "sd": 1.168, "reps": [1.464, 3.492, 3.48]}, {"t": 1.0, "mean": 2.468, "sd": 1.1, "reps": [1.223, 2.873, 3.308]}, {"t": 2.0, "mean": 2.987, "sd": 0.293, "reps": [2.667, 3.056, 3.24]}, {"t": 3.0, "mean": 3.102, "sd": 0.26, "reps": [2.987, 2.919, 3.4]}, {"t": 4.0, "mean": 3.362, "sd": 0.398, "reps": [3.056, 3.217, 3.812]}, {"t": 5.0, "mean": 3.247, "sd": 0.402, "reps": [3.629, 2.827, 3.285]}, {"t": 6.0, "mean": 3.347, "sd": 0.287, "reps": [3.354, 3.629, 3.056]}, {"t": 7.5, "mean": 3.423, "sd": 0.121, "reps": [3.56, 3.331, 3.377]}, {"t": 9.0, "mean": 3.453, "sd": 0.318, "reps": [3.721, 3.102, 3.537]}, {"t": 10.5, "mean": 3.736, "sd": 0.187, "reps": [3.95, 3.652, 3.606]}, {"t": 12.0, "mean": 3.706, "sd": 0.378, "reps": [4.088, 3.331, 3.698]}, {"t": 21.5, "mean": 3.835, "sd": 0.379, "reps": [3.812, 3.469, 4.225]}]}, "0.6|non-BSA|PEG": {"control": [{"t": 0.0, "mean": 2.636, "sd": 0.986, "reps": [3.171, 3.24, 1.498]}, {"t": 1.0, "mean": 3.224, "sd": 0.34, "reps": [3.308, 2.85, 3.515]}, {"t": 2.0, "mean": 3.385, "sd": 0.058, "reps": [3.377, 3.331, 3.446]}, {"t": 3.0, "mean": 3.156, "sd": 0.245, "reps": [3.285, 3.308, 2.873]}, {"t": 4.0, "mean": 2.789, "sd": 0.463, "reps": [3.285, 2.712, 2.369]}, {"t": 5.0, "mean": 3.041, "sd": 0.191, "reps": [3.194, 3.102, 2.827]}, {"t": 6.0, "mean": 1.956, "sd": 1.568, "reps": [2.873, 0.146, 2.85]}, {"t": 7.5, "mean": 3.461, "sd": 0.583, "reps": [3.583, 3.973, 2.827]}, {"t": 9.0, "mean": 2.881, "sd": 0.665, "reps": [3.606, 2.3, 2.735]}, {"t": 10.5, "mean": 2.781, "sd": 1.893, "reps": [0.627, 4.179, 3.537]}, {"t": 12.0, "mean": 3.4, "sd": 0.42, "reps": [3.033, 3.858, 3.308]}, {"t": 21.5, "mean": 3.163, "sd": 0.08, "reps": [3.079, 3.24, 3.171]}], "magnet": [{"t": 0.0, "mean": 2.361, "sd": 0.589, "reps": [2.987, 1.819, 2.277]}, {"t": 1.0, "mean": 2.109, "sd": 1.758, "reps": [3.537, 2.644, 0.146]}, {"t": 2.0, "mean": 2.674, "sd": 0.507, "reps": [3.148, 2.14, 2.735]}, {"t": 3.0, "mean": 3.079, "sd": 0.534, "reps": [3.24, 2.483, 3.515]}, {"t": 4.0, "mean": 3.278, "sd": 0.609, "reps": [3.629, 2.575, 3.629]}, {"t": 5.0, "mean": 3.301, "sd": 0.831, "reps": [3.858, 2.346, 3.698]}, {"t": 6.0, "mean": 3.362, "sd": 0.642, "reps": [3.744, 2.621, 3.721]}, {"t": 7.5, "mean": 3.224, "sd": 0.436, "reps": [3.675, 2.804, 3.194]}, {"t": 9.0, "mean": 3.079, "sd": 0.706, "reps": [3.606, 2.277, 3.354]}, {"t": 10.5, "mean": 3.354, "sd": 1.035, "reps": [4.477, 2.438, 3.148]}, {"t": 12.0, "mean": 3.377, "sd": 0.278, "reps": [3.675, 3.331, 3.125]}, {"t": 21.5, "mean": 3.347, "sd": 0.402, "reps": [3.767, 2.965, 3.308]}]}}, "diffs": [{"cond": "0.4|BSA|COOH", "diff": 0.58, "magnet": 3.224, "control": 2.644, "magnet_sd": 0.798, "control_sd": 0.681}, {"cond": "0.4|BSA|PEG", "diff": 1.214, "magnet": 3.667, "control": 2.453, "magnet_sd": 0.187, "control_sd": 0.213}, {"cond": "0.4|non-BSA|COOH", "diff": -0.267, "magnet": 3.973, "control": 4.24, "magnet_sd": 0.258, "control_sd": 1.041}, {"cond": "0.4|non-BSA|PEG", "diff": 0.611, "magnet": 3.415, "control": 2.804, "magnet_sd": 0.355, "control_sd": 0.774}, {"cond": "0.6|BSA|COOH", "diff": 0.023, "magnet": 3.14, "control": 3.117, "magnet_sd": 0.303, "control_sd": 0.499}, {"cond": "0.6|BSA|PEG", "diff": 0.837, "magnet": 3.171, "control": 2.334, "magnet_sd": 0.346, "control_sd": 0.697}, {"cond": "0.6|non-BSA|COOH", "diff": 0.359, "magnet": 3.835, "control": 3.476, "magnet_sd": 0.379, "control_sd": 1.11}, {"cond": "0.6|non-BSA|PEG", "diff": 0.184, "magnet": 3.347, "control": 3.163, "magnet_sd": 0.402, "control_sd": 0.08}], "stats": {"mean_diff": 0.44, "t": 2.66, "n_pos": 7, "n": 8}};
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const tip = document.createElement('div'); tip.id='tip'; tip.hidden=true; document.body.appendChild(tip);
+function showTip(e, txt){ tip.textContent=txt; tip.hidden=false;
+  tip.style.left=Math.min(e.clientX+14, innerWidth-180)+'px'; tip.style.top=(e.clientY+14)+'px'; }
+function hideTip(){ tip.hidden=true; }
+
+// stat tiles
+const st = DATA.stats;
+document.getElementById('tiles').innerHTML = `
+  <div class="tile"><b>+${st.mean_diff} mm</b><span>magnet-added depth at 21.5 h (mean of 8 conditions, t = ${st.t})</span></div>
+  <div class="tile"><b>${st.n_pos} of ${st.n}</b><span>conditions where magnet &gt; control at 21.5 h</span></div>
+  <div class="tile"><b>&le; 4 mm</b><span>deepest band reached of the 10 mm block &mdash; transport is shallow in every condition</span></div>`;
+
+// small multiples
+const W=250,H=170,M={l:30,r:8,t:8,b:22};
+const xs=t=>M.l+(W-M.l-M.r)*t/22, ys=v=>H-M.b-(H-M.b-M.t)*v/5;
+const order = ["0.4|BSA|PEG","0.4|BSA|COOH","0.4|non-BSA|PEG","0.4|non-BSA|COOH",
+               "0.6|BSA|PEG","0.6|BSA|COOH","0.6|non-BSA|PEG","0.6|non-BSA|COOH"];
+function seriesPath(pts,fy){return pts.map((p,i)=>(i?'L':'M')+xs(p.t).toFixed(1)+','+fy(p).toFixed(1)).join(' ');}
+let panelsHtml='';
+order.forEach((key,pi)=>{
+  const c=DATA.curves[key];
+  const [ag,bsa,co]=key.split('|');
+  let svg=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="band depth over time, ${ag}% ${bsa} ${co}">`;
+  for(let v=0;v<=5;v++) svg+=`<line x1="${M.l}" x2="${W-M.r}" y1="${ys(v)}" y2="${ys(v)}" stroke="var(--grid)" stroke-width="1"/>`;
+  svg+=`<line x1="${M.l}" x2="${W-M.r}" y1="${ys(0)}" y2="${ys(0)}" stroke="var(--baseline)" stroke-width="1.5"/>`;
+  [0,6,12,21.5].forEach(t=>svg+=`<text x="${xs(t)}" y="${H-6}" font-size="9" fill="var(--muted)" text-anchor="middle">${t}h</text>`);
+  [0,2,4].forEach(v=>svg+=`<text x="${M.l-4}" y="${ys(v)+3}" font-size="9" fill="var(--muted)" text-anchor="end">${v}</text>`);
+  [['control','var(--ctrl)','var(--ctrl-soft)','5 4'],['magnet','var(--mag)','var(--mag-soft)','']].forEach(([arm,col,soft,dash])=>{
+    const pts=c[arm];
+    const band=pts.map(p=>xs(p.t).toFixed(1)+','+ys(Math.min(5,p.mean+p.sd)).toFixed(1)).join(' ')+' '+
+               pts.slice().reverse().map(p=>xs(p.t).toFixed(1)+','+ys(Math.max(0,p.mean-p.sd)).toFixed(1)).join(' ');
+    svg+=`<polygon points="${band}" fill="${soft}" stroke="none"/>`;
+    svg+=`<path d="${seriesPath(pts,p=>ys(p.mean))}" fill="none" stroke="${col}" stroke-width="2" ${dash?`stroke-dasharray="${dash}"`:''}/>`;
+    pts.forEach(p=>{svg+=`<circle cx="${xs(p.t)}" cy="${ys(p.mean)}" r="6" fill="transparent" stroke="none" pointer-events="all"
+      data-tip="${ag}% ${bsa} ${co}\n${arm} @ ${p.t}h\nmean ${p.mean.toFixed(2)} mm (sd ${p.sd.toFixed(2)})\nreps: ${p.reps.map(v=>v.toFixed(1)).join(', ')}"/>`;
+      svg+=`<circle cx="${xs(p.t)}" cy="${ys(p.mean)}" r="2.4" fill="${col}" stroke="var(--surface)" stroke-width="1" pointer-events="none"/>`;});
+  });
+  svg+='</svg>';
+  panelsHtml+=`<div class="panel"><h3>${ag}% &middot; ${bsa} &middot; ${co}</h3><p class="cap">depth, mm</p>${svg}</div>`;
+});
+document.getElementById('panels').innerHTML=panelsHtml;
+
+// final-depth dot plot + paired diff bars
+(function(){
+  const rows=order.map(k=>{const d=DATA.diffs.find(x=>x.cond===k);
+    const cm=DATA.curves[k].magnet.find(p=>p.t===21.5), cc=DATA.curves[k].control.find(p=>p.t===21.5);
+    return {k,d,cm,cc};});
+  const RW=980, RH=8*34+50, L0=205, L1=620, G0=700, G1=950;
+  const xd=v=>L0+(L1-L0)*v/5, xg=v=>G0+(G1-G0)/2+(G1-G0)/2*v/1.5;
+  let svg=`<svg viewBox="0 0 ${RW} ${RH}" role="img" aria-label="depth at 21.5 hours by condition">`;
+  for(let v=0;v<=5;v++){svg+=`<line x1="${xd(v)}" x2="${xd(v)}" y1="26" y2="${RH-24}" stroke="var(--grid)"/>`;
+    svg+=`<text x="${xd(v)}" y="${RH-8}" font-size="10" fill="var(--muted)" text-anchor="middle">${v}</text>`;}
+  svg+=`<text x="${(L0+L1)/2}" y="16" font-size="11" fill="var(--ink2)" text-anchor="middle">band depth at 21.5 h (mm)</text>`;
+  svg+=`<text x="${(G0+G1)/2}" y="16" font-size="11" fill="var(--ink2)" text-anchor="middle">magnet &minus; control (mm)</text>`;
+  svg+=`<line x1="${xg(0)}" x2="${xg(0)}" y1="26" y2="${RH-24}" stroke="var(--baseline)" stroke-width="1.5"/>`;
+  [-1,0,1].forEach(v=>svg+=`<text x="${xg(v)}" y="${RH-8}" font-size="10" fill="var(--muted)" text-anchor="middle">${v>0?'+':''}${v}</text>`);
+  rows.forEach((r,i)=>{
+    const y=40+i*34; const [ag,bsa,co]=r.k.split('|');
+    svg+=`<text x="196" y="${y+4}" font-size="11.5" fill="var(--ink)" text-anchor="end" font-family="IBM Plex Mono,monospace">${ag}% ${bsa} ${co}</text>`;
+    svg+=`<line x1="${xd(r.cc.mean)}" x2="${xd(r.cm.mean)}" y1="${y}" y2="${y}" stroke="var(--grid)" stroke-width="1.5"/>`;
+    r.cc.reps.forEach(v=>svg+=`<circle cx="${xd(v)}" cy="${y}" r="2.4" fill="var(--ctrl)" opacity=".38"/>`);
+    r.cm.reps.forEach(v=>svg+=`<circle cx="${xd(v)}" cy="${y}" r="2.4" fill="var(--mag)" opacity=".45"/>`);
+    svg+=`<circle cx="${xd(r.cc.mean)}" cy="${y}" r="5.5" fill="var(--ctrl)" stroke="var(--surface)" stroke-width="2"
+      data-tip="${ag}% ${bsa} ${co}\ncontrol mean ${r.cc.mean.toFixed(2)} mm (sd ${r.cc.sd.toFixed(2)})"/>`;
+    svg+=`<circle cx="${xd(r.cm.mean)}" cy="${y}" r="5.5" fill="var(--mag)" stroke="var(--surface)" stroke-width="2"
+      data-tip="${ag}% ${bsa} ${co}\nmagnet mean ${r.cm.mean.toFixed(2)} mm (sd ${r.cm.sd.toFixed(2)})"/>`;
+    const w=xg(r.d.diff)-xg(0);
+    svg+=`<rect x="${Math.min(xg(0),xg(r.d.diff))}" y="${y-7}" width="${Math.abs(w)}" height="14" rx="3"
+      fill="var(--mag)" opacity="${r.d.diff>=0? .85 : .35}"
+      data-tip="${ag}% ${bsa} ${co}\nmagnet − control = ${r.d.diff>0?'+':''}${r.d.diff.toFixed(2)} mm"/>`;
+  });
+  svg+='</svg>';
+  document.getElementById('finalrow').innerHTML=svg;
+})();
+
+// table view
+(function(){
+  let t='<table><tr><th>condition</th><th>control mean</th><th>control sd</th><th>magnet mean</th><th>magnet sd</th><th>diff</th></tr>';
+  order.forEach(k=>{const d=DATA.diffs.find(x=>x.cond===k);
+    t+=`<tr><td>${k.replaceAll('|',' ')}</td><td>${d.control.toFixed(2)}</td><td>${d.control_sd.toFixed(2)}</td><td>${d.magnet.toFixed(2)}</td><td>${d.magnet_sd.toFixed(2)}</td><td>${d.diff>0?'+':''}${d.diff.toFixed(2)}</td></tr>`;});
+  document.getElementById('tblwrap').innerHTML=t+'</table>';
+})();
+
+// shared tooltip
+document.addEventListener('mousemove', e=>{
+  const el=e.target.closest('[data-tip]');
+  if(el) showTip(e, el.getAttribute('data-tip').replaceAll('\\n','\n')); else hideTip();
+});
+</script>
