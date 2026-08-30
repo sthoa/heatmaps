@@ -45,7 +45,7 @@ Validated frame-by-frame against the photos (see `analysis/outputs/r2_validation
 ## Key findings (Aug 27 run)
 
 - Bulk transport through the gel is shallow: the visible NP band reaches ≤ 4 mm of the 10 mm block in every condition. Controls plateau at ~3 mm within the first hour; magnet arms keep advancing all run (+0.44 mm at 21.5 h, 7/8 conditions, paired t = 2.66).
-- NPs do reach the magnet-side wall (deposit observed on disassembly), most plausibly via the agarose–case interface / block bottom — a route the top view cannot quantify because the magnet occludes and shadows that zone.
+- NPs do reach the magnet-side wall: on disassembly a deposit sits directly in front of the magnet face (not at the bottom or side seams), i.e. the NPs traveled **through the agarose**. The through-gel flux is too dilute to tint the gel visibly in transit but concentrates into a visible patch at the wall; the top view cannot quantify it because the magnet occludes and shadows that zone.
 - Coating / BSA / agarose % differences are within repeat-level noise at n = 3.
 - Protocol notes for future runs: lock exposure and white balance, mount the camera, keep a gray card in frame, and photograph all blocks magnet-off (top + side) at the end of the run.
 
