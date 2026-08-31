@@ -33,31 +33,74 @@ STAGES = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
 VMAX = 55.0
 
 
-def block_rect(img):
-    """minAreaRect of the agarose block (both halves of a centre-split gel)."""
+def gel_mask(img):
+    """Gel, including NP-darkened gel. The orange sticker sits at s>170 and the
+    white holder at s<25, so 25<=s<=140 isolates gel across the whole run."""
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     h, s, v = hsv[..., 0], hsv[..., 1], hsv[..., 2]
-    gel = ((h >= 5) & (h <= 40) & (s >= 30) & (s <= 105) & (v >= 100) & (v <= 250)).astype(np.uint8)
+    gel = ((h >= 5) & (h <= 40) & (s >= 25) & (s <= 140) & (v >= 70) & (v <= 250)).astype(np.uint8)
     gel = cv2.morphologyEx(gel, cv2.MORPH_OPEN, np.ones((9, 9), np.uint8))
-    gel = cv2.morphologyEx(gel, cv2.MORPH_CLOSE, np.ones((11, 11), np.uint8))
+    return cv2.morphologyEx(gel, cv2.MORPH_CLOSE, np.ones((11, 11), np.uint8))
+
+
+def _quad(mask):
+    """4-corner polygon of a mask (true perspective corners, not a bounding
+    rotated rect - the block is a trapezoid when the camera is tilted)."""
+    cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    if not cnts:
+        return None
+    hull = cv2.convexHull(max(cnts, key=cv2.contourArea))
+    peri = cv2.arcLength(hull, True)
+    for eps in np.linspace(0.015, 0.09, 12):
+        ap = cv2.approxPolyDP(hull, eps * peri, True)
+        if len(ap) == 4:
+            return ap.reshape(4, 2).astype(np.float32)
+    return cv2.boxPoints(cv2.minAreaRect(hull)).astype(np.float32)
+
+
+def _score(mask):
+    """squareness x fill of a candidate block mask (the block is a 10x10 square)."""
+    pts = cv2.findNonZero(mask)
+    if pts is None:
+        return -1, None
+    rect = cv2.minAreaRect(pts)
+    (_, _), (rw, rh), _ = rect
+    if min(rw, rh) < 20:
+        return -1, None
+    aspect = max(rw, rh) / min(rw, rh)
+    extent = float(mask.sum()) / (rw * rh)
+    if aspect > 1.9 or extent < 0.45:
+        return -1, None
+    return (1.0 / aspect) * extent * (rw * rh), rect
+
+
+def block_quad(img):
+    """Corners of the agarose block. The centre gap splits the gel into two
+    halves and NP accumulation darkens one of them, so candidate halves are
+    combined and the most square-and-full combination wins."""
+    gel = gel_mask(img)
     n, labels, stats, cents = cv2.connectedComponentsWithStats(gel, 8)
     H, W = gel.shape
-    cands = [(stats[i, 4], i) for i in range(1, n) if stats[i, 4] > 0.012 * H * W]
+    cands = [(stats[i, 4], i) for i in range(1, n) if stats[i, 4] > 0.004 * H * W]
     if not cands:
         return None
     cands.sort(reverse=True)
     main_a, main_i = cands[0]
     mc = cents[main_i]
     scale = max(stats[main_i, 2], stats[main_i, 3])
-    keep = [main_i]
-    for a, i in cands[1:]:
-        if np.hypot(cents[i][0] - mc[0], cents[i][1] - mc[1]) < 1.1 * scale and a > 0.3 * main_a:
-            keep.append(i)
-    rect = cv2.minAreaRect(cv2.findNonZero(np.isin(labels, keep).astype(np.uint8)))
-    (_, _), (rw, rh), _ = rect
-    if max(rw, rh) / max(min(rw, rh), 1) > 1.5 and len(keep) > 1:
-        rect = cv2.minAreaRect(cv2.findNonZero((labels == main_i).astype(np.uint8)))
-    return rect
+    near = [i for a, i in cands[1:]
+            if np.hypot(cents[i][0] - mc[0], cents[i][1] - mc[1]) < 1.3 * scale and a > 0.06 * main_a]
+    best_s, best_mask = -1, None
+    combos = [[main_i]] + [[main_i, j] for j in near] + ([[main_i] + near] if len(near) > 1 else [])
+    for combo in combos:
+        mask = np.isin(labels, combo).astype(np.uint8)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, np.ones((31, 31), np.uint8))
+        sc, _ = _score(mask)
+        if sc > best_s:
+            best_s, best_mask = sc, mask
+    if best_mask is None:
+        return None
+    return _quad(best_mask)
 
 
 def magnet_side(img, rect):
@@ -151,11 +194,13 @@ ROT_BY_DATE = {
 }
 
 
-def warped_by_date(img, rect, date):
-    box = cv2.boxPoints(rect).astype(np.float32)
-    quad = order_corners(box)
+def warped_by_date(img, quad, date):
+    """Perspective-correct the block quad to a square, then rotate so the
+    magnet side faces RIGHT. Using the true 4 corners (not a bounding rotated
+    rect) keeps the centre gap vertical when the camera was tilted."""
+    q = order_corners(quad)
     dst = np.array([[0, 0], [WARP, 0], [WARP, WARP], [0, WARP]], dtype=np.float32)
-    w = cv2.warpPerspective(img, cv2.getPerspectiveTransform(quad, dst), (WARP, WARP))
+    w = cv2.warpPerspective(img, cv2.getPerspectiveTransform(q, dst), (WARP, WARP))
     k = ROT_BY_DATE.get(date, 0)
     if k:
         w = np.ascontiguousarray(np.rot90(w, k=k))
@@ -167,8 +212,8 @@ MARGIN = 38  # px of the 480 warp trimmed per side (~0.8 mm): the gel pulls away
 EXTENT_MM = (MARGIN / WARP * 10.0, 10.0 - MARGIN / WARP * 10.0)
 
 
-def field_by_date(img, rect, date):
-    w = warped_by_date(img, rect, date)
+def field_by_date(img, quad, date):
+    w = warped_by_date(img, quad, date)
     L = cv2.cvtColor(w, cv2.COLOR_BGR2LAB)[..., 0].astype(np.float32)
     D = (255.0 - L)[MARGIN:WARP - MARGIN, MARGIN:WARP - MARGIN]
     h, wd = D.shape
@@ -203,10 +248,10 @@ def main():
                     if i is None:
                         continue
                     img = load(i)
-                    rect = block_rect(img)
-                    if rect is None:
+                    quad = block_quad(img)
+                    if quad is None:
                         continue
-                    maps.append(process_abs(field_by_date(img, rect, sg.iloc[0].date)))
+                    maps.append(process_abs(field_by_date(img, quad, sg.iloc[0].date)))
                 if not maps:
                     ax.text(.5, .5, "no frame", ha="center", va="center", fontsize=7,
                             color="gray", transform=ax.transAxes)
