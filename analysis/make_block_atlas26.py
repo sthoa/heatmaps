@@ -67,22 +67,12 @@ def main():
         return int(sub.iloc[0].idx) if len(sub) else None
 
     for bsa, bg in m.groupby("bsa"):
-        # BSA agarose is intrinsically cloudier and darker than non-BSA, so the
-        # absolute-darkness scale is not comparable between the two panels.
-        # Each panel gets its own scale; within a panel every cell shares it, so
-        # magnet-vs-control and PEG-vs-COOH remain directly comparable.
-        vals = []
-        for _, sg in bg.groupby("series"):
-            for t in (0.0, 3.0, 6.0):
-                sub = sg[sg.timepoint_hr == t]
-                if not len(sub):
-                    continue
-                img = load(int(sub.iloc[0].idx))
-                q = block_quad(img)
-                if q is None:
-                    continue
-                vals.append(np.percentile(process_abs(field(img, q)), 97))
-        vmax = float(np.clip(np.median(vals) * 1.15, 35, 110)) if vals else VMAX
+        # One shared 0-VMAX scale across BSA, non-BSA and the other experiment
+        # days, so panels are directly comparable. BSA gel is intrinsically
+        # cloudier (raw darkness ~127 vs ~67 for non-BSA), so its controls
+        # saturate at this ceiling - that is the cloudiness, not transport, and
+        # the asymmetry metric is the readout to trust for BSA.
+        vmax = VMAX
         rows = [("PEG", False, "PEG + magnet\n(mean r1-r3)"), ("PEG", True, "PEG control\n(no magnet)"),
                 ("COOH", False, "COOH + magnet\n(mean r1-r3)"), ("COOH", True, "COOH control\n(no magnet)")]
         fig, axes = plt.subplots(len(rows), len(STAGES), figsize=(len(STAGES) * 1.72, len(rows) * 1.72))
@@ -133,7 +123,7 @@ def main():
         sm = plt.cm.ScalarMappable(cmap="inferno", norm=plt.Normalize(0, vmax))
         cb = fig.colorbar(sm, cax=cax, orientation="horizontal")
         cb.set_ticks([0, round(vmax/2), round(vmax)]); cb.ax.tick_params(labelsize=6, pad=1)
-        cb.set_label(f"NP darkness above this block's gel floor (L*) — scale set for {bsa} gel", fontsize=6.5, labelpad=2)
+        cb.set_label("NP darkness above this block's gel floor (L*) — same scale as the other run days", fontsize=6.5, labelpad=2)
         plt.savefig(outdir / f"{bsa}.png", dpi=118)
         plt.close(fig)
         print("done", bsa, flush=True)
