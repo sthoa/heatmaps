@@ -112,6 +112,16 @@ def detect_gap_run(img, Y0, Y1):
     return None, None
 
 
+def rim_bright_start(Lm, lo, hi):
+    """first x in [lo,hi) where the next 12 columns average L>200 (lit rim);
+    gel tops out ~195, shadow/magnet ~130 — unambiguous separator."""
+    lo = max(0, lo)
+    for x in range(lo, hi):
+        if np.mean(Lm[x:x + 12]) > 200:
+            return x
+    return None
+
+
 class SeriesGeom:
     """Per-series geometry derived from its t=0 frame."""
 
@@ -140,6 +150,15 @@ class SeriesGeom:
         lo, hi = max(1, self.GL0 - 15), self.GL0 + 15
         dwf = np.diff(wf0[lo:hi])
         self.rimedge0 = lo + int(np.argmin(dwf))
+        # right rim inner edge at t0: steepest brightness RISE (gel -> lit print)
+        L0m = gaussian_filter1d(
+            cv2.cvtColor(img0, cv2.COLOR_BGR2LAB)[..., 0].astype(np.float32)[self.Y0 + 30:self.Y1 - 30, :].mean(axis=0), 3)
+        self.rimR0 = rim_bright_start(L0m, self.X1 - 55, min(466, self.X1 + 12))
+        if self.rimR0 is not None and self.rimR0 - 2 < self.X1:
+            # crop's right edge = measured rim edge (the color-scan guess overshoots)
+            self.X1 = self.rimR0 - 2
+            self.mm_per_px = 10.0 / ((self.X1 - self.GL0) - self.GB)
+            self.left_mm = -self.GB * self.mm_per_px
 
     def aligned_field(self, img):
         warp = np.eye(2, 3, dtype=np.float32)
@@ -180,6 +199,19 @@ class SeriesGeom:
         if shift:
             Mx = np.float32([[1, 0, shift], [0, 1, 0]])
             img = cv2.warpAffine(img, Mx, (480, 480), flags=cv2.INTER_LINEAR)
+        # right rim: the case is rigid, so after left-anchoring the right rim
+        # should sit where t0's did; residual scale mismatch is corrected by a
+        # 1D stretch pinned at the left rim edge
+        if self.rimR0 is not None:
+            Lm = gaussian_filter1d(
+                cv2.cvtColor(img, cv2.COLOR_BGR2LAB)[..., 0].astype(np.float32)[self.Y0 + 30:self.Y1 - 30, :].mean(axis=0), 3)
+            rimR = rim_bright_start(Lm, self.rimR0 - 60, min(466, self.rimR0 + 30))
+            if rimR is not None:
+                if abs(rimR - self.rimR0) > 2:
+                    sx = (self.rimR0 - self.rimedge0) / max(rimR - self.rimedge0, 1)
+                    if 0.85 < sx < 1.18:
+                        Mx = np.float32([[sx, 0, self.rimedge0 - sx * self.rimedge0], [0, 1, 0]])
+                        img = cv2.warpAffine(img, Mx, (480, 480), flags=cv2.INTER_LINEAR)
         # fine stage: align the rim's inner edge (steepest white->dark fall)
         # onto t0's — immune to the gap draining/narrowing over time
         wf = whitefrac_cols(img, self.Y0, self.Y1)
