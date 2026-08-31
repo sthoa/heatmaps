@@ -87,29 +87,27 @@ def crop_from_t0(img0):
 
 
 def detect_gap_run(img, Y0, Y1):
-    """dark run after the white rim — same structural rule as at t=0."""
+    """The gap is the dark column-run immediately followed by a LONG bright
+    region (the gel block). Fabric fails this (only a narrow rim follows it);
+    no rim detection needed (rims can be shadowed, pale gel reads as white)."""
     L = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)[..., 0].astype(np.float32)
-    band = L[Y0 + 30:Y1 - 30, :230]
-    darkf = gaussian_filter1d((band < 130).astype(np.float32).mean(axis=0), 3)
-    wf = whitefrac_cols(img, Y0, Y1)[:230]
-    in_rim = False
-    rim_len = 0
+    meanL = gaussian_filter1d(L[Y0 + 30:Y1 - 30, :260].mean(axis=0), 3)
+    dark = meanL < 135
     i = 0
-    n = len(wf)
+    n = len(dark)
     while i < n:
-        if not in_rim:
-            if wf[i] > 0.55:
-                rim_len += 1
-                if rim_len >= 10:
-                    in_rim = True
-            else:
-                rim_len = 0
-        else:
-            if darkf[i] > 0.5:
-                gl = i
-                while i < n and darkf[i] > 0.35:
-                    i += 1
-                return gl, i - gl
+        if dark[i]:
+            start = i
+            while i < n and dark[i]:
+                i += 1
+            R = i  # run end (exclusive) = candidate gap/block boundary
+            if start == 0:
+                continue  # touches the canvas edge: fabric/border, keep scanning
+            nxt = meanL[R + 3:R + 63]
+            if len(nxt) >= 45 and np.mean(nxt) > 150 and np.mean(nxt > 140) > 0.65:
+                gl = max(start, R - 50)
+                if gl >= 8 and 8 <= R - gl <= 60:
+                    return gl, R - gl
         i += 1
     return None, None
 
@@ -120,36 +118,12 @@ class SeriesGeom:
     def __init__(self, img0):
         self.ref_gm = gradmag(img0)
         self.X1, self.Y0, self.Y1 = crop_from_t0(img0)
-        # the gap at t=0 is the NP-black run that comes AFTER the white rim
-        # (a dark run touching the canvas edge is background fabric, not gap).
-        L0 = cv2.cvtColor(img0, cv2.COLOR_BGR2LAB)[..., 0].astype(np.float32)
-        band = L0[self.Y0 + 30:self.Y1 - 30, :230]
-        darkf = gaussian_filter1d((band < 130).astype(np.float32).mean(axis=0), 3)
-        wf = whitefrac_cols(img0, self.Y0, self.Y1)[:230]
-        self.ok = False
-        in_rim = False
-        rim_len = 0
-        i = 0
-        n = len(wf)
-        while i < n:
-            if not in_rim:
-                if wf[i] > 0.55:
-                    rim_len += 1
-                    if rim_len >= 10:
-                        in_rim = True
-                else:
-                    rim_len = 0
-            else:
-                if darkf[i] > 0.5:  # first dark run after the rim = gap
-                    gl = i
-                    while i < n and darkf[i] > 0.35:
-                        i += 1
-                    width = i - gl
-                    if 12 <= width <= 90:
-                        self.GL0, self.GB = gl, width
-                        self.ok = True
-                    break
-            i += 1
+        # gap detection: same rule as per-frame (dark run followed by the
+        # long bright block) — validated against shadowed rims and pale gels
+        gl, wdt = detect_gap_run(img0, self.Y0, self.Y1)
+        self.ok = gl is not None and gl <= 210
+        if self.ok:
+            self.GL0, self.GB = gl, wdt
         if not self.ok:
             self.GL0, self.GB = BASE["x0"] + 108, 40
         if (self.X1 - self.GL0) < 220 or (self.Y1 - self.Y0) < 220:
