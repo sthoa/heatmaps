@@ -221,8 +221,26 @@ def field_by_date(img, quad, date):
     return np.median(D[: hb * 11, : wb * 11].reshape(hb, 11, wb, 11), axis=(1, 3))
 
 
+def repaired_quads():
+    """Per-photo block quads with series-median outlier repair (block23_series).
+
+    The block does not change size between shots, so a quad that disagrees with
+    its series' median size or shape is a detection failure; replacing those
+    with the median shape at the frame's own centroid halves the geometry noise
+    floor (see block23_series and nav_metrics3).
+    """
+    f = Path(__file__).parent / "geom23_series.csv"
+    if not f.exists():
+        return {}
+    g = pd.read_csv(f)
+    cols = [f"q{j}{a}" for j in range(4) for a in "xy"]
+    return {int(r.idx): np.asarray([r[c] for c in cols], np.float32).reshape(4, 2)
+            for _, r in g.iterrows()}
+
+
 def main():
     m = pd.read_csv(Path(__file__).parent / "photos23_final.csv", parse_dates=["capture_time"])
+    QUADS = repaired_quads()
     m["date"] = m.capture_time.dt.date
     outdir = S / "panels"
     outdir.mkdir(exist_ok=True)
@@ -248,7 +266,9 @@ def main():
                     if i is None:
                         continue
                     img = load(i)
-                    quad = block_quad(img)
+                    quad = QUADS.get(int(i))
+                    if quad is None:
+                        quad = block_quad(img)
                     if quad is None:
                         continue
                     maps.append(process_abs(field_by_date(img, quad, sg.iloc[0].date)))
