@@ -1,0 +1,410 @@
+{
+ "0.6 CENTER/0 hrs after magnet/PXL_20260826_151915365.jpg": {
+  "tally_fixed": 2,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Two stroke groups, matches repeat-2 reference (idx87/119/135)."
+ },
+ "0.6 CENTER/0 hrs after magnet/PXL_20260826_152006635.jpg": {
+  "tally_fixed": 1,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Single stroke group, matches repeat-1 reference (idx86/118/134); confirms original low-confidence guess."
+ },
+ "0.6 CENTER/0.5 hrs/PXL_20260826_153730995.jpg": {
+  "tally_fixed": 1,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Single short tick, matches repeat-1 reference (idx0/63/112)."
+ },
+ "0.6 CENTER/0.5 hrs/PXL_20260826_153804515.jpg": {
+  "tally_fixed": 3,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Three stroke groups spanning pad width, matches repeat-3 reference (idx2/65/113)."
+ },
+ "0.6 CENTER/0.5 hrs/PXL_20260826_153836786.jpg": {
+  "tally_fixed": 2,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Only two stroke groups visible (not three), matches repeat-2 reference (idx1/64/114); original read of 3 overcounted lines."
+ },
+ "0.6 CENTER/0.5 hrs/PXL_20260826_154021800.jpg": {
+  "tally_fixed": 2,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Two stroke groups, matches repeat-2 reference (idx87/119/135)."
+ },
+ "0.6 CENTER/0.5 hrs/PXL_20260826_154041860.jpg": {
+  "tally_fixed": 1,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Single stroke group (not two), matches repeat-1 reference (idx86/118/134); corrects duplicate '2' assignment within this group."
+ },
+ "0.6 CENTER/0.5 hrs/PXL_20260826_154056201.jpg": {
+  "tally_fixed": 3,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Three stroke groups, matches repeat-3 reference (idx88/120/136)."
+ },
+ "0.6 CENTER/1 hr/PXL_20260826_161121250.jpg": {
+  "tally_fixed": 2,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Two stroke groups, matches repeat-2 reference (idx1/64/114)."
+ },
+ "0.6 CENTER/1 hr/PXL_20260826_161155530.jpg": {
+  "tally_fixed": 3,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Three stroke groups, matches repeat-3 reference (idx2/65/113)."
+ },
+ "0.6 CENTER/1 hr/PXL_20260826_161341772.jpg": {
+  "tally_fixed": 2,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Two stroke groups, matches repeat-2 reference (idx3/19/100)."
+ },
+ "0.6 CENTER/1 hr/PXL_20260826_161416369.jpg": {
+  "tally_fixed": 1,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Single stroke group (not three), matches repeat-1 reference (idx4/21/99); corrects duplicate '3' assignment within this group."
+ },
+ "0.6 CENTER/1 hr/PXL_20260826_161455744.jpg": {
+  "tally_fixed": 3,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Three stroke groups, matches repeat-3 reference (idx5/20/101)."
+ },
+ "0.6 CENTER/1 hr/PXL_20260826_161718270.jpg": {
+  "tally_fixed": 1,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Single stroke group positioned like repeat-1 reference (idx9/25/121), not three; corrects duplicate '3' assignment within this group."
+ },
+ "0.6 CENTER/1 hr/PXL_20260826_161751094.jpg": {
+  "tally_fixed": 3,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Three stroke groups spanning full pad width, matches repeat-3 reference (idx10/26/123)."
+ },
+ "0.6 CENTER/1 hr/PXL_20260826_161826907.jpg": {
+  "tally_fixed": 2,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Two stroke groups, matches repeat-2 reference (idx11/27/122)."
+ },
+ "0.6 CENTER/1 hr/PXL_20260826_161543682.jpg": {
+  "tally_fixed": 1,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Single stroke cluster matches repeat-1 reference (0086/0118/0134); current read 2 was miscounted."
+ },
+ "0.6 CENTER/1 hr/PXL_20260826_161610922.jpg": {
+  "tally_fixed": 2,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Two stroke clusters match repeat-2 reference; confirms current read."
+ },
+ "0.6 CENTER/1 hr/PXL_20260826_161640991.jpg": {
+  "tally_fixed": 3,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Three stroke clusters match repeat-3 reference; confirms current read."
+ },
+ "0.6 CENTER/1.5 hrs/PXL_20260826_163848822.jpg": {
+  "tally_fixed": 2,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Two stroke clusters match repeat-2 reference (0003/0019/0100); current read 3 was wrong."
+ },
+ "0.6 CENTER/1.5 hrs/PXL_20260826_163910370.jpg": {
+  "tally_fixed": 1,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Single stroke cluster matches repeat-1 reference; current read 3 was wrong."
+ },
+ "0.6 CENTER/1.5 hrs/PXL_20260826_163937630.jpg": {
+  "tally_fixed": 3,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Three stroke clusters match repeat-3 reference; confirms current read."
+ },
+ "0.6 CENTER/1.5 hrs/PXL_20260826_164103754.jpg": {
+  "tally_fixed": 1,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Single stroke with distinctive top tick matches repeat-1 reference (0009/0025/0121); current read 2 was wrong."
+ },
+ "0.6 CENTER/1.5 hrs/PXL_20260826_164134072.jpg": {
+  "tally_fixed": 2,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Two stroke clusters match repeat-2 reference; current read 3 was wrong."
+ },
+ "0.6 CENTER/1.5 hrs/PXL_20260826_164218694.jpg": {
+  "tally_fixed": 3,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Three stroke clusters match repeat-3 reference; confirms current read."
+ },
+ "0.6 CENTER/1.5 hrs/PXL_20260826_163733925.jpg": {
+  "tally_fixed": 1,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Single exclamation-shaped mark matches repeat-1 reference (0000/0063/0112); confirms current read."
+ },
+ "0.6 CENTER/1.5 hrs/PXL_20260826_163754148.jpg": {
+  "tally_fixed": 2,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Two stroke clusters match repeat-2 reference; current read 3 was wrong."
+ },
+ "0.6 CENTER/1.5 hrs/PXL_20260826_163828049.jpg": {
+  "tally_fixed": 3,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Three stroke clusters match repeat-3 reference; confirms current read."
+ },
+ "0.6 CENTER/1.5 hrs/PXL_20260826_164001581.jpg": {
+  "tally_fixed": 1,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Single stroke cluster matches repeat-1 reference; confirms current read."
+ },
+ "0.6 CENTER/1.5 hrs/PXL_20260826_164021421.jpg": {
+  "tally_fixed": 2,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Two stroke clusters match repeat-2 reference; current read 3 was wrong."
+ },
+ "0.6 CENTER/1.5 hrs/PXL_20260826_164040938.jpg": {
+  "tally_fixed": 3,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Three stroke clusters match repeat-3 reference; confirms current read."
+ },
+ "0.6 CENTER/2 hrs/PXL_20260826_170921021.jpg": {
+  "tally_fixed": 1,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Single stroke cluster matches repeat-1 reference; confirms current read."
+ },
+ "0.6 CENTER/2 hrs/PXL_20260826_171000056.jpg": {
+  "tally_fixed": 2,
+  "duplicate": false,
+  "certainty": "low",
+  "note": "Appears as one faint/compressed stroke cluster, but 66 already matches repeat 1 (high) and 68 matches repeat 3 (high); assigned 2 by elimination to complete the {1,2,3} set."
+ },
+ "0.6 CENTER/2 hrs/PXL_20260826_171037601.jpg": {
+  "tally_fixed": 3,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Three stroke clusters match repeat-3 reference; confirms current read."
+ },
+ "0.6 CENTER/2 hrs/PXL_20260826_171250000.jpg": {
+  "tally_fixed": 1,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Single tight stroke cluster (no internal gap) matches repeat-1 refs 9/25/121; changed from 2"
+ },
+ "0.6 CENTER/2 hrs/PXL_20260826_171322536.jpg": {
+  "tally_fixed": 2,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Two stroke-group clusters separated by a gap matches repeat-2 refs 11/27/122; changed from 3"
+ },
+ "0.6 CENTER/2 hrs/PXL_20260826_171404200.jpg": {
+  "tally_fixed": 3,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Three stroke-group clusters spanning full strap width matches repeat-3 refs 10/26/123; unchanged"
+ },
+ "0.6 CENTER/2 hrs/PXL_20260826_171112449.jpg": {
+  "tally_fixed": 1,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Single tight cluster matches repeat-1 refs 86/118/134; unchanged"
+ },
+ "0.6 CENTER/2 hrs/PXL_20260826_171148701.jpg": {
+  "tally_fixed": 2,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Two-cluster pattern matches repeat-2 refs 87/119/135; unchanged"
+ },
+ "0.6 CENTER/2 hrs/PXL_20260826_171215245.jpg": {
+  "tally_fixed": 3,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Three-cluster pattern spanning wider area matches repeat-3 refs 88/120/136, not repeat 2; changed from 2"
+ },
+ "0.6 CENTER/2.5 hrs/PXL_20260826_175039786.jpg": {
+  "tally_fixed": 1,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Single tight cluster matches repeat-1 refs 4/21/99; unchanged"
+ },
+ "0.6 CENTER/2.5 hrs/PXL_20260826_175123358.jpg": {
+  "tally_fixed": 2,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Two-cluster pattern matches repeat-2 refs 3/19/100; unchanged"
+ },
+ "0.6 CENTER/2.5 hrs/PXL_20260826_175232350.jpg": {
+  "tally_fixed": 3,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Three-cluster pattern matches repeat-3 refs 5/20/101; unchanged"
+ },
+ "0.6 CENTER/2.5 hrs/PXL_20260826_175251478.jpg": {
+  "tally_fixed": 3,
+  "duplicate": true,
+  "certainty": "low",
+  "note": "Also shows a three-cluster repeat-3 pattern nearly identical to photo 84; treated as the 4th/odd photo, likely a duplicate retake of the same repeat-3 strap"
+ },
+ "0.6 CENTER/2.5 hrs/PXL_20260826_175557361.jpg": {
+  "tally_fixed": 1,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Single tight cluster matches repeat-1 refs 9/25/121; unchanged"
+ },
+ "0.6 CENTER/2.5 hrs/PXL_20260826_175750917.jpg": {
+  "tally_fixed": 2,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Two-cluster pattern matches repeat-2 refs 11/27/122; changed from 3"
+ },
+ "0.6 CENTER/2.5 hrs/PXL_20260826_175836441.jpg": {
+  "tally_fixed": 3,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Three-cluster pattern spanning full width matches repeat-3 refs 10/26/123; unchanged"
+ },
+ "0.6 CENTER/2.5 hrs/PXL_20260826_174757278.jpg": {
+  "tally_fixed": 1,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Single tight cluster matches repeat-1 refs 0/63/112; unchanged"
+ },
+ "0.6 CENTER/2.5 hrs/PXL_20260826_174902987.jpg": {
+  "tally_fixed": 2,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Two-cluster pattern matches repeat-2 refs 1/64/114; changed from 3"
+ },
+ "0.6 CENTER/2.5 hrs/PXL_20260826_174950346.jpg": {
+  "tally_fixed": 3,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Three-cluster pattern matches repeat-3 refs 2/65/113; unchanged"
+ },
+ "0.6 CENTER/3 hrs/PXL_20260826_181722313.jpg": {
+  "tally_fixed": 1,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Single tight cluster matches repeat-1 refs 9/25/121 closely; changed from low-confidence 2"
+ },
+ "0.6 CENTER/3 hrs/PXL_20260826_181746855.jpg": {
+  "tally_fixed": 2,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Two-cluster pattern matches repeat-2 refs 11/27/122; value unchanged but confidence raised from low to high"
+ },
+ "0.6 CENTER/3 hrs/PXL_20260826_181812179.jpg": {
+  "tally_fixed": 3,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "Three-cluster pattern spanning full width matches repeat-3 refs 10/26/123; changed from low-confidence 2"
+ },
+ "0.6 CENTER/3 hrs/PXL_20260826_181300941.jpg": {
+  "tally_fixed": 1,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "single stroke group, matches repeat1 reference (0000/0063/0112)"
+ },
+ "0.6 CENTER/3 hrs/PXL_20260826_181326307.jpg": {
+  "tally_fixed": 2,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "two clearly separated stroke groups (II), matches repeat2 reference (0001/0064/0114); current_read 3 was wrong"
+ },
+ "0.6 CENTER/3 hrs/PXL_20260826_181346650.jpg": {
+  "tally_fixed": 3,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "three stroke groups (III), matches repeat3 reference (0002/0065/0113)"
+ },
+ "0.6 CENTER/3 hrs/PXL_20260826_181525861.jpg": {
+  "tally_fixed": 1,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "single stroke group, matches repeat1 reference (0086/0118/0134)"
+ },
+ "0.6 CENTER/3 hrs/PXL_20260826_181544465.jpg": {
+  "tally_fixed": 2,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "two stroke groups (II), matches repeat2 reference (0087/0119/0135); current_read 3 was wrong"
+ },
+ "0.6 CENTER/3 hrs/PXL_20260826_181631408.jpg": {
+  "tally_fixed": 3,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "three stroke groups (III), matches repeat3 reference (0088/0120/0136)"
+ },
+ "0.6 CENTER/4 hrs/PXL_20260826_191817126.jpg": {
+  "tally_fixed": 1,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "single stroke group, matches repeat1 reference (0009/0025/0121); current_read 3 was wrong"
+ },
+ "0.6 CENTER/4 hrs/PXL_20260826_191841531.jpg": {
+  "tally_fixed": 2,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "two stroke groups (II), matches repeat2 reference (0011/0027/0122); current_read 3 was wrong"
+ },
+ "0.6 CENTER/4 hrs/PXL_20260826_191910010.jpg": {
+  "tally_fixed": 3,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "three stroke groups (III), matches repeat3 reference (0010/0026/0123)"
+ },
+ "0.6 CENTER/5.5 hrs/PXL_20260826_204949874.jpg": {
+  "tally_fixed": 1,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "single stroke group, matches repeat1 reference (0009/0025/0121)"
+ },
+ "0.6 CENTER/5.5 hrs/PXL_20260826_205012206.jpg": {
+  "tally_fixed": 2,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "two stroke groups (II), matches repeat2 reference (0011/0027/0122); current_read 3 (low conf) was wrong"
+ },
+ "0.6 CENTER/5.5 hrs/PXL_20260826_205042597.jpg": {
+  "tally_fixed": 3,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "three stroke groups (III), matches repeat3 reference (0010/0026/0123)"
+ },
+ "0.6 CENTER/5.5 hrs/PXL_20260826_204358999.jpg": {
+  "tally_fixed": 1,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "single stroke group, matches repeat1 reference (0000/0063/0112)"
+ },
+ "0.6 CENTER/5.5 hrs/PXL_20260826_204510170.jpg": {
+  "tally_fixed": 3,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "three stroke groups (III), matches repeat3 reference (0002/0065/0113)"
+ },
+ "0.6 CENTER/5.5 hrs/PXL_20260826_204610506.jpg": {
+  "tally_fixed": 2,
+  "duplicate": false,
+  "certainty": "high",
+  "note": "two stroke groups (II), matches repeat2 reference (0001/0064/0114); current_read 3 (low conf) was wrong"
+ }
+}

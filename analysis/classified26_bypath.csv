@@ -1,0 +1,210 @@
+path,v_sticker,v_coating,v_bsa,v_control,v_ctrl_vertical,v_tally,v_magnet,v_conf,v_notes
+0.6 CENTER/0 hrs after magnet/PXL_20260826_151358972.jpg,PEG 0.6 BSA,PEG,True,False,,1.0,present,high,
+0.6 CENTER/0 hrs after magnet/PXL_20260826_151452121.jpg,PEG 0.6 BSA,PEG,True,False,,2.0,present,high,
+0.6 CENTER/0 hrs after magnet/PXL_20260826_151531216.jpg,PEG 0.6 BSA,PEG,True,False,,3.0,present,high,
+0.6 CENTER/0 hrs after magnet/PXL_20260826_151626163.jpg,COOH 0.6 BSA,COOH,True,False,,2.0,present,high,
+0.6 CENTER/0 hrs after magnet/PXL_20260826_151707066.jpg,COOH 0.6 BSA,COOH,True,False,,1.0,present,high,
+0.6 CENTER/0 hrs after magnet/PXL_20260826_151743160.jpg,COOH 0.6 BSA,COOH,True,False,,3.0,present,low,"sticker text very faint/blurry, coating read as COOH with reduced confidence"
+0.6 CENTER/0 hrs after magnet/PXL_20260826_151816295.jpg,,unsure,,False,,1.0,present,low,"sticker occluded/folded under gel holder in all three crops, text not visible; control=false inferred from magnet being present"
+0.6 CENTER/0 hrs after magnet/PXL_20260826_151915365.jpg,PEG 0.6,PEG,False,False,,2.0,present,high,
+0.6 CENTER/0 hrs after magnet/PXL_20260826_152006635.jpg,PEG 0.6,PEG,False,False,,1.0,present,low,tally mark on strap very faint/light pink
+0.6 CENTER/0 hrs after magnet/PXL_20260826_152118182.jpg,COOH 0.6,COOH,False,False,,1.0,present,high,
+0.6 CENTER/0 hrs after magnet/PXL_20260826_152205398.jpg,COOH 0.6,COOH,False,False,,3.0,present,high,
+0.6 CENTER/0 hrs after magnet/PXL_20260826_152245462.jpg,COOH 0.6,COOH,False,False,,2.0,present,high,
+0.6 CENTER/0 hrs after magnet/PXL_20260826_152616632.jpg,PEG 0.6 BSA CTRL,PEG,True,True,True,,none,high,
+0.6 CENTER/0 hrs after magnet/PXL_20260826_152651538.jpg,COOH 0.6 BSA CTRL,COOH,True,True,True,,none,low,"sticker text messy/doubled (CTRL appears written twice), but CTRL clearly vertical"
+0.6 CENTER/0 hrs after magnet/PXL_20260826_152720564.jpg,PEG 0.6 CTRL,PEG,False,True,False,,none,high,
+0.6 CENTER/0 hrs after magnet/PXL_20260826_152748382.jpg,COOH 0.6 CTRL,COOH,False,True,False,,none,high,
+0.6 CENTER/0.5 hrs/PXL_20260826_153730995.jpg,PEG 0.6 BSA,PEG,True,False,,1.0,present,high,
+0.6 CENTER/0.5 hrs/PXL_20260826_153804515.jpg,PEG 0.6 BSA,PEG,True,False,,3.0,present,high,
+0.6 CENTER/0.5 hrs/PXL_20260826_153836786.jpg,PEG 0.6 BSA,PEG,True,False,,3.0,present,high,
+0.6 CENTER/0.5 hrs/PXL_20260826_153904104.jpg,COOH 0.6 BSA,COOH,True,False,,2.0,present,high,
+0.6 CENTER/0.5 hrs/PXL_20260826_153926775.jpg,COOH 0.6 BSA,COOH,True,False,,3.0,present,high,
+0.6 CENTER/0.5 hrs/PXL_20260826_153946681.jpg,COOH 0.6 BSA,COOH,True,False,,1.0,present,low,"COOH lettering garbled/doubled strokes, tally mark faint/dashed"
+0.6 CENTER/0.5 hrs/PXL_20260826_154021800.jpg,PEG 0.6,PEG,False,False,,2.0,present,high,
+0.6 CENTER/0.5 hrs/PXL_20260826_154041860.jpg,PEG 0.6,PEG,False,False,,2.0,present,low,"tally pattern nearly identical to idx0022, possibly a duplicate photo of the same repeat"
+0.6 CENTER/0.5 hrs/PXL_20260826_154056201.jpg,PEG 0.6,PEG,False,False,,3.0,present,high,
+0.6 CENTER/0.5 hrs/PXL_20260826_154126780.jpg,COOH 0.6,COOH,False,False,,1.0,present,high,
+0.6 CENTER/0.5 hrs/PXL_20260826_154151451.jpg,COOH 0.6,COOH,False,False,,3.0,present,high,
+0.6 CENTER/0.5 hrs/PXL_20260826_154228611.jpg,COOH 0.6,COOH,False,False,,2.0,present,high,
+0.6 CENTER/0.5 hrs/PXL_20260826_154451171.jpg,PEG 0.6 BSA CTRL,PEG,True,True,True,,none,high,
+0.6 CENTER/0.5 hrs/PXL_20260826_154509670.jpg,COOH 0.6 BSA CTRL,COOH,True,True,True,,none,low,"sticker text messy/doubled similar to idx0013, but CTRL clearly vertical"
+0.6 CENTER/0.5 hrs/PXL_20260826_154529883.jpg,PEG 0.6 CTRL,PEG,False,True,False,,none,high,
+0.6 CENTER/0.5 hrs/PXL_20260826_154552852.jpg,COOH 0.6 CTRL,COOH,False,True,False,,none,high,
+0.6 CENTER/1 hr/PXL_20260826_161121250.jpg,PEG 0.6 BSA,PEG,True,False,,2.0,present,high,
+0.6 CENTER/1 hr/PXL_20260826_161155530.jpg,PEG 0.6 BSA,PEG,True,False,,3.0,present,high,bottom of BSA line slightly cropped in sticker_hi image but legible
+0.6 CENTER/1 hr/PXL_20260826_161341772.jpg,COOH 0.6 BSA,COOH,True,False,,2.0,present,high,
+0.6 CENTER/1 hr/PXL_20260826_161416369.jpg,COOH 0.6 BSA,COOH,True,False,,3.0,present,low,"tally strap marks blurred/motion-smeared, count uncertain (looked like a tight cluster)"
+0.6 CENTER/1 hr/PXL_20260826_161455744.jpg,COOH 0.6 BSA,COOH,True,False,,3.0,present,high,
+0.6 CENTER/1 hr/PXL_20260826_161543682.jpg,PEG 0.6,PEG,False,False,,2.0,present,high,
+0.6 CENTER/1 hr/PXL_20260826_161610922.jpg,PEG 0.6,PEG,False,False,,2.0,present,high,
+0.6 CENTER/1 hr/PXL_20260826_161640991.jpg,PEG 0.6,PEG,False,False,,3.0,present,high,
+0.6 CENTER/1 hr/PXL_20260826_161718270.jpg,COOH 0.6,COOH,False,False,,3.0,present,high,
+0.6 CENTER/1 hr/PXL_20260826_161751094.jpg,COOH 0.6,COOH,False,False,,3.0,present,high,
+0.6 CENTER/1 hr/PXL_20260826_161826907.jpg,COOH 0.6,COOH,False,False,,2.0,present,high,
+0.6 CENTER/1 hr/PXL_20260826_162235029.jpg,PEG 0.6 BSA CTRL (vertical),PEG,True,True,True,,none,high,"faint extra horizontal marking below BSA, possibly a second CTRL attempt or smudge; frame/color photo confirms PEG 0.6 BSA + vertical CTRL"
+0.6 CENTER/1 hr/PXL_20260826_162301845.jpg,COOH 0.6 BSA CTRL (vertical),COOH,True,True,True,,none,high,"small unexplained squiggle between BSA column and vertical CTRL, doesn't change reading; confirmed via color sticker photo"
+0.6 CENTER/1 hr/PXL_20260826_162334174.jpg,PEG 0.6 CTRL,PEG,False,True,False,,none,high,
+0.6 CENTER/1 hr/PXL_20260826_162357799.jpg,COOH 0.6 CTRL,COOH,False,True,False,,none,high,
+0.6 CENTER/1.5 hrs/PXL_20260826_163733925.jpg,PEG 0.6 BSA,PEG,True,False,,1.0,present,high,
+0.6 CENTER/1.5 hrs/PXL_20260826_163754148.jpg,PEG 0.6 BSA,PEG,True,False,,3.0,present,high,
+0.6 CENTER/1.5 hrs/PXL_20260826_163828049.jpg,PEG 0.6 BSA,PEG,True,False,,3.0,present,high,
+0.6 CENTER/1.5 hrs/PXL_20260826_163848822.jpg,COOH 0.6 BSA,COOH,True,False,,3.0,present,low,"strap marks appear as a doubled/thick cluster, count of 3 not fully certain"
+0.6 CENTER/1.5 hrs/PXL_20260826_163910370.jpg,COOH 0.6 BSA,COOH,True,False,,3.0,present,low,"strap marks tightly clustered in two columns, could be more than 3"
+0.6 CENTER/1.5 hrs/PXL_20260826_163937630.jpg,COOH 0.6 BSA,COOH,True,False,,3.0,present,high,
+0.6 CENTER/1.5 hrs/PXL_20260826_164001581.jpg,PEG 0.6,PEG,False,False,,1.0,present,high,
+0.6 CENTER/1.5 hrs/PXL_20260826_164021421.jpg,PEG 0.6,PEG,False,False,,3.0,present,high,
+0.6 CENTER/1.5 hrs/PXL_20260826_164040938.jpg,PEG 0.6,PEG,False,False,,3.0,present,high,
+0.6 CENTER/1.5 hrs/PXL_20260826_164103754.jpg,COOH 0.6,COOH,False,False,,2.0,present,high,
+0.6 CENTER/1.5 hrs/PXL_20260826_164134072.jpg,COOH 0.6,COOH,False,False,,3.0,present,low,"strap marks appear as doubled cluster (2x2), count of 3 not fully certain"
+0.6 CENTER/1.5 hrs/PXL_20260826_164218694.jpg,COOH 0.6,COOH,False,False,,3.0,present,high,
+0.6 CENTER/1.5 hrs/PXL_20260826_164428849.jpg,PEG 0.6 BSA CTRL (vertical),PEG,True,True,True,,none,high,second PEG+BSA control sample (replicate of idx 0043)
+0.6 CENTER/1.5 hrs/PXL_20260826_164505612.jpg,COOH 0.6 BSA CTRL (vertical),COOH,True,True,True,,none,high,second COOH+BSA control sample (replicate of idx 0044)
+0.6 CENTER/1.5 hrs/PXL_20260826_164533473.jpg,PEG 0.6 CTRL,PEG,False,True,False,,none,high,second PEG non-BSA control sample (replicate of idx 0045)
+0.6 CENTER/1.5 hrs/PXL_20260826_164603003.jpg,COOH 0.6 CTRL,COOH,False,True,False,,none,high,second COOH non-BSA control sample (replicate of idx 0046)
+0.6 CENTER/2 hrs/PXL_20260826_170716822.jpg,PEG 0.6 BSA,PEG,True,False,,1.0,present,high,
+0.6 CENTER/2 hrs/PXL_20260826_170742026.jpg,PEG 0.6 BSA,PEG,True,False,,2.0,present,high,
+0.6 CENTER/2 hrs/PXL_20260826_170828401.jpg,PEG 0.6 BSA,PEG,True,False,,3.0,present,low,"strap marks clustered, count of 3 not fully certain"
+0.6 CENTER/2 hrs/PXL_20260826_170921021.jpg,COOH 0.6 BSA,COOH,True,False,,1.0,present,high,
+0.6 CENTER/2 hrs/PXL_20260826_171000056.jpg,COOH 0.6 BSA,COOH,True,False,,3.0,present,low,"strap marks appear as doubled cluster (2x2), count of 3 not fully certain"
+0.6 CENTER/2 hrs/PXL_20260826_171037601.jpg,COOH 0.6 BSA,COOH,True,False,,3.0,present,high,
+0.6 CENTER/2 hrs/PXL_20260826_171112449.jpg,PEG 0.6,PEG,False,False,,1.0,present,high,
+0.6 CENTER/2 hrs/PXL_20260826_171148701.jpg,PEG 0.6,PEG,False,False,,2.0,present,high,
+0.6 CENTER/2 hrs/PXL_20260826_171215245.jpg,PEG 0.6,PEG,False,False,,2.0,present,high,
+0.6 CENTER/2 hrs/PXL_20260826_171250000.jpg,COOH 0.6,COOH,False,False,,2.0,present,high,
+0.6 CENTER/2 hrs/PXL_20260826_171322536.jpg,COOH 0.6,COOH,False,False,,3.0,present,high,
+0.6 CENTER/2 hrs/PXL_20260826_171404200.jpg,COOH 0.6,COOH,False,False,,3.0,present,high,
+0.6 CENTER/2 hrs/PXL_20260826_171926790.jpg,COOH 0.6 BSA CTRL,COOH,True,True,True,,none,high,"BSA control; CTRL written vertically on right side of sticker, confirmed via color crop and frame (no magnet visible)"
+0.6 CENTER/2 hrs/PXL_20260826_171957019.jpg,PEG 0.6 CTRL,PEG,False,True,False,,none,high,"non-BSA control, CTRL horizontal"
+0.6 CENTER/2 hrs/PXL_20260826_172018062.jpg,COOH 0.6 CTRL,COOH,False,True,False,,none,high,"non-BSA control, CTRL horizontal"
+0.6 CENTER/2 hrs/PXL_20260826_172337574.jpg,PEG 0.6 BSA CTRL,PEG,True,True,True,,none,high,BSA control; CTRL written vertically on right side of sticker
+0.6 CENTER/2.5 hrs/PXL_20260826_174757278.jpg,PEG 0.6 BSA,PEG,True,False,,1.0,present,high,
+0.6 CENTER/2.5 hrs/PXL_20260826_174902987.jpg,PEG 0.6 BSA,PEG,True,False,,3.0,present,high,
+0.6 CENTER/2.5 hrs/PXL_20260826_174950346.jpg,PEG 0.6 BSA,PEG,True,False,,3.0,present,high,
+0.6 CENTER/2.5 hrs/PXL_20260826_175039786.jpg,COOH 0.6 BSA,COOH,True,False,,1.0,present,high,
+0.6 CENTER/2.5 hrs/PXL_20260826_175123358.jpg,COOH 0.6 BSA,COOH,True,False,,2.0,present,high,
+0.6 CENTER/2.5 hrs/PXL_20260826_175232350.jpg,COOH 0.6 BSA,COOH,True,False,,3.0,present,high,sticker photographed at an angle but legible
+0.6 CENTER/2.5 hrs/PXL_20260826_175251478.jpg,COOH 0.6 BSA,COOH,True,False,,3.0,present,high,sticker photographed at an angle but legible
+0.6 CENTER/2.5 hrs/PXL_20260826_175332943.jpg,PEG 0.6,PEG,False,False,,1.0,present,high,
+0.6 CENTER/2.5 hrs/PXL_20260826_175432703.jpg,PEG 0.6,PEG,False,False,,2.0,present,high,
+0.6 CENTER/2.5 hrs/PXL_20260826_175515504.jpg,PEG 0.6,PEG,False,False,,3.0,present,high,
+0.6 CENTER/2.5 hrs/PXL_20260826_175557361.jpg,COOH 0.6,COOH,False,False,,1.0,present,high,
+0.6 CENTER/2.5 hrs/PXL_20260826_175750917.jpg,COOH 0.6,COOH,False,False,,3.0,present,high,
+0.6 CENTER/2.5 hrs/PXL_20260826_175836441.jpg,COOH 0.6,COOH,False,False,,3.0,present,high,
+0.6 CENTER/2.5 hrs/PXL_20260826_180358557.jpg,PEG 0.6 BSA CTRL,PEG,True,True,True,,none,high,BSA control; CTRL written vertically on right side of sticker; appears to duplicate sample seen at idx 0078
+0.6 CENTER/2.5 hrs/PXL_20260826_180439064.jpg,COOH 0.6 BSA CTRL,COOH,True,True,True,,none,high,BSA control; CTRL written vertically; appears to duplicate sample seen at idx 0075
+0.6 CENTER/2.5 hrs/PXL_20260826_180515007.jpg,PEG 0.6 CTRL,PEG,False,True,False,,none,high,"non-BSA control, CTRL horizontal; appears to duplicate sample seen at idx 0076"
+0.6 CENTER/2.5 hrs/PXL_20260826_180541433.jpg,COOH 0.6 CTRL,COOH,False,True,False,,none,high,"non-BSA control, CTRL horizontal; appears to duplicate sample seen at idx 0077"
+0.6 CENTER/3 hrs/PXL_20260826_181300941.jpg,PEG 0.6 BSA,PEG,True,False,,1.0,present,high,
+0.6 CENTER/3 hrs/PXL_20260826_181326307.jpg,PEG 0.6 BSA,PEG,True,False,,3.0,present,high,
+0.6 CENTER/3 hrs/PXL_20260826_181346650.jpg,PEG 0.6 BSA,PEG,True,False,,3.0,present,high,
+0.6 CENTER/3 hrs/PXL_20260826_181409034.jpg,COOH 0.6 BSA,COOH,True,False,,1.0,present,high,
+0.6 CENTER/3 hrs/PXL_20260826_181431137.jpg,COOH 0.6 BSA,COOH,True,False,,2.0,present,high,
+0.6 CENTER/3 hrs/PXL_20260826_181500160.jpg,COOH 0.6 BSA,COOH,True,False,,3.0,present,low,sticker_hi crop is significantly blurred; reading is best-effort
+0.6 CENTER/3 hrs/PXL_20260826_181525861.jpg,PEG 0.6,PEG,False,False,,1.0,present,high,
+0.6 CENTER/3 hrs/PXL_20260826_181544465.jpg,PEG 0.6,PEG,False,False,,3.0,present,high,
+0.6 CENTER/3 hrs/PXL_20260826_181631408.jpg,PEG 0.6,PEG,False,False,,3.0,present,high,
+0.6 CENTER/3 hrs/PXL_20260826_181722313.jpg,COOH 0.6,COOH,False,False,,2.0,present,low,trio 0105-0107 tally marks similarly hatched/clustered on the ridged pad; 1 vs 2 vs 3 not reliably distinguishable
+0.6 CENTER/3 hrs/PXL_20260826_181746855.jpg,COOH 0.6,COOH,False,False,,2.0,present,low,"see 0105 note; hatched marks, low confidence"
+0.6 CENTER/3 hrs/PXL_20260826_181812179.jpg,COOH 0.6,COOH,False,False,,2.0,present,low,"marks appear on top pad rather than bottom; hatched, low confidence"
+0.6 CENTER/3 hrs/PXL_20260826_182037197.jpg,PEG 0.6 BSA CTRL,PEG,True,True,True,,none,high,
+0.6 CENTER/3 hrs/PXL_20260826_182109829.jpg,COOH 0.6 BSA CTRL,COOH,True,True,True,,none,high,confirmed no magnet via frame photo
+0.6 CENTER/3 hrs/PXL_20260826_182132801.jpg,PEG 0.6 CTRL,PEG,False,True,False,,none,high,
+0.6 CENTER/3 hrs/PXL_20260826_182159108.jpg,COOH 0.6 CTRL,COOH,False,True,False,,none,high,
+0.6 CENTER/3.5 hrs/PXL_20260826_183920827.jpg,PEG 0.6 BSA,PEG,True,False,,1.0,present,high,
+0.6 CENTER/3.5 hrs/PXL_20260826_183950969.jpg,PEG 0.6 BSA,PEG,True,False,,3.0,present,high,
+0.6 CENTER/3.5 hrs/PXL_20260826_184006708.jpg,PEG 0.6 BSA,PEG,True,False,,2.0,present,low,marks bold/doubled; read as 2 by elimination within trio 0112(=1)/0113(=3)
+0.6 CENTER/3.5 hrs/PXL_20260826_184026617.jpg,COOH 0.6 BSA,COOH,True,False,,1.0,present,high,
+0.6 CENTER/3.5 hrs/PXL_20260826_184052578.jpg,COOH 0.6 BSA,COOH,True,False,,2.0,present,low,dotted/doubled marks
+0.6 CENTER/3.5 hrs/PXL_20260826_184114875.jpg,COOH 0.6 BSA,COOH,True,False,,3.0,present,high,
+0.6 CENTER/3.5 hrs/PXL_20260826_184153179.jpg,PEG 0.6,PEG,False,False,,1.0,present,high,
+0.6 CENTER/3.5 hrs/PXL_20260826_184217135.jpg,PEG 0.6,PEG,False,False,,2.0,present,low,marks doubled/thick
+0.6 CENTER/3.5 hrs/PXL_20260826_184248346.jpg,PEG 0.6,PEG,False,False,,3.0,present,high,
+0.6 CENTER/3.5 hrs/PXL_20260826_184319926.jpg,COOH 0.6,COOH,False,False,,1.0,present,high,
+0.6 CENTER/3.5 hrs/PXL_20260826_184349008.jpg,COOH 0.6,COOH,False,False,,2.0,present,low,hatched marks; read as 2 by elimination within trio 0121(=1)/0123(=3)
+0.6 CENTER/3.5 hrs/PXL_20260826_184415416.jpg,COOH 0.6,COOH,False,False,,3.0,present,high,
+0.6 CENTER/3.5 hrs/PXL_20260826_184645047.jpg,PEG 0.6 BSA CTRL,PEG,True,True,True,,none,high,
+0.6 CENTER/3.5 hrs/PXL_20260826_184711323.jpg,COOH 0.6 BSA CTRL,COOH,True,True,True,,none,high,
+0.6 CENTER/3.5 hrs/PXL_20260826_184736725.jpg,PEG 0.6 CTRL,PEG,False,True,False,,none,high,
+0.6 CENTER/3.5 hrs/PXL_20260826_184753091.jpg,COOH 0.6 CTRL,COOH,False,True,False,,none,high,
+0.6 CENTER/4 hrs/PXL_20260826_190958574.jpg,PEG 0.6 BSA,PEG,True,False,,1.0,present,high,
+0.6 CENTER/4 hrs/PXL_20260826_191029940.jpg,PEG 0.6 BSA,PEG,True,False,,2.0,present,low,marks appeared dense/wide; read as 2 by elimination within trio 0128(=1)/0130(=3)
+0.6 CENTER/4 hrs/PXL_20260826_191437366.jpg,PEG 0.6 BSA,PEG,True,False,,3.0,present,high,
+0.6 CENTER/4 hrs/PXL_20260826_191500022.jpg,COOH 0.6 BSA,COOH,True,False,,1.0,present,high,
+0.6 CENTER/4 hrs/PXL_20260826_191526286.jpg,COOH 0.6 BSA,COOH,True,False,,2.0,present,low,doubled marks
+0.6 CENTER/4 hrs/PXL_20260826_191558289.jpg,COOH 0.6 BSA,COOH,True,False,,3.0,present,high,
+0.6 CENTER/4 hrs/PXL_20260826_191644204.jpg,PEG 0.6,PEG,False,False,,1.0,present,high,
+0.6 CENTER/4 hrs/PXL_20260826_191720478.jpg,PEG 0.6,PEG,False,False,,2.0,present,low,doubled marks
+0.6 CENTER/4 hrs/PXL_20260826_191747243.jpg,PEG 0.6,PEG,False,False,,3.0,present,high,
+0.6 CENTER/4 hrs/PXL_20260826_191817126.jpg,COOH 0.6,COOH,False,False,,3.0,present,high,magnet not obvious in tally crop; confirmed present via frame photo
+0.6 CENTER/4 hrs/PXL_20260826_191841531.jpg,COOH 0.6,COOH,False,False,,3.0,present,high,
+0.6 CENTER/4 hrs/PXL_20260826_191910010.jpg,COOH 0.6,COOH,False,False,,3.0,present,high,"trio 0137-0139 all read tally=3, breaking the expected 1/2/3 repeat pattern seen elsewhere - recommend manual review"
+0.6 CENTER/4 hrs/PXL_20260826_192214980.jpg,PEG 0.6 BSA CTRL,PEG,True,True,True,,none,high,
+0.6 CENTER/4 hrs/PXL_20260826_192300653.jpg,COOH 0.6 CTRL,COOH,False,True,False,,none,high,
+0.6 CENTER/4 hrs/PXL_20260826_192344070.jpg,COOH 0.6 BSA CTRL,COOH,True,True,True,,none,low,BSA word very faint on sticker; read as present based on faint strokes and vertical CTRL matching the BSA-control pattern
+0.6 CENTER/4 hrs/PXL_20260826_192453202.jpg,PEG 0.6 CTRL,PEG,False,True,False,,none,high,
+0.6 CENTER/4.5 hrs/PXL_20260826_193939945.jpg,PEG 0.6 BSA,PEG,True,False,,1.0,present,high,
+0.6 CENTER/4.5 hrs/PXL_20260826_194012857.jpg,PEG 0.6 BSA,PEG,True,False,,2.0,present,high,
+0.6 CENTER/4.5 hrs/PXL_20260826_194049195.jpg,PEG 0.6 BSA,PEG,True,False,,3.0,present,high,
+0.6 CENTER/4.5 hrs/PXL_20260826_194121243.jpg,COOH 0.6 BSA,COOH,True,False,,1.0,present,low,"single tally stroke on strap is smudged/scratchy, tangled with loose fiber strands, making exact stroke count harder to confirm"
+0.6 CENTER/4.5 hrs/PXL_20260826_194231859.jpg,COOH 0.6 BSA,COOH,True,False,,2.0,present,high,
+0.6 CENTER/4.5 hrs/PXL_20260826_194301654.jpg,COOH 0.6 BSA,COOH,True,False,,3.0,present,low,"sticker text very blurry, coating/BSA read from faint outlines"
+0.6 CENTER/4.5 hrs/PXL_20260826_194608027.jpg,PEG 0.6,PEG,False,False,,1.0,present,high,
+0.6 CENTER/4.5 hrs/PXL_20260826_194658720.jpg,PEG 0.6,PEG,False,False,,2.0,present,high,
+0.6 CENTER/4.5 hrs/PXL_20260826_194732570.jpg,PEG 0.6,PEG,False,False,,3.0,present,high,
+0.6 CENTER/4.5 hrs/PXL_20260826_194756404.jpg,COOH 0.6,COOH,False,False,,1.0,present,high,
+0.6 CENTER/4.5 hrs/PXL_20260826_194828954.jpg,COOH 0.6,COOH,False,False,,2.0,present,high,
+0.6 CENTER/4.5 hrs/PXL_20260826_194921273.jpg,COOH 0.6,COOH,False,False,,3.0,present,high,
+0.6 CENTER/4.5 hrs/PXL_20260826_195241157.jpg,PEG 0.6 BSA CTRL,PEG,True,True,True,,none,high,second CTRL photo for the PEG+BSA control condition (duplicate of 0140's condition)
+0.6 CENTER/4.5 hrs/PXL_20260826_195305380.jpg,COOH 0.6 CTRL,COOH,False,True,False,,none,high,second CTRL photo for the COOH/non-BSA control condition (duplicate of 0141's condition)
+0.6 CENTER/4.5 hrs/PXL_20260826_195346224.jpg,COOH 0.6 BSA CTRL,COOH,True,True,True,,none,low,BSA word very faint; second CTRL photo for COOH+BSA control condition (duplicate of 0142's condition)
+0.6 CENTER/4.5 hrs/PXL_20260826_195418410.jpg,PEG 0.6 CTRL,PEG,False,True,False,,none,high,second CTRL photo for the PEG/non-BSA control condition (duplicate of 0143's condition)
+0.6 CENTER/5 hrs/PXL_20260826_201335033.jpg,PEG 0.6 BSA,PEG,True,False,,1.0,present,high,
+0.6 CENTER/5 hrs/PXL_20260826_201431200.jpg,PEG 0.6 BSA,PEG,True,False,,2.0,present,high,
+0.6 CENTER/5 hrs/PXL_20260826_201512822.jpg,PEG 0.6 BSA,PEG,True,False,,3.0,present,high,
+0.6 CENTER/5 hrs/PXL_20260826_201606139.jpg,COOH 0.6 BSA,COOH,True,False,,1.0,present,low,BSA word faint
+0.6 CENTER/5 hrs/PXL_20260826_201641574.jpg,COOH 0.6 BSA,COOH,True,False,,2.0,present,high,
+0.6 CENTER/5 hrs/PXL_20260826_201725101.jpg,COOH 0.6 BSA,COOH,True,False,,3.0,present,low,bottom of sticker (BSA line) partly out of frame in the hi-contrast crop; coating/BSA inferred from sequence with 0163/0164
+0.6 CENTER/5 hrs/PXL_20260826_201810157.jpg,PEG 0.6,PEG,False,False,,1.0,present,high,
+0.6 CENTER/5 hrs/PXL_20260826_201853317.jpg,PEG 0.6,PEG,False,False,,2.0,present,high,
+0.6 CENTER/5 hrs/PXL_20260826_201930479.jpg,PEG 0.6,PEG,False,False,,3.0,present,high,
+0.6 CENTER/5 hrs/PXL_20260826_202002415.jpg,COOH 0.6,COOH,False,False,,1.0,present,high,
+0.6 CENTER/5 hrs/PXL_20260826_202035829.jpg,COOH 0.6,COOH,False,False,,2.0,present,high,
+0.6 CENTER/5 hrs/PXL_20260826_202112553.jpg,COOH 0.6,COOH,False,False,,3.0,present,high,
+0.6 CENTER/5 hrs/PXL_20260826_202350445.jpg,PEG 0.6 BSA CTRL,PEG,True,True,True,,none,high,third CTRL photo for the PEG+BSA control condition (duplicate of 0140/0156)
+0.6 CENTER/5 hrs/PXL_20260826_202459405.jpg,COOH 0.6 BSA CTRL,COOH,True,True,True,,none,low,BSA word very faint; third CTRL photo for COOH+BSA control condition (duplicate of 0142/0158)
+0.6 CENTER/5 hrs/PXL_20260826_202517510.jpg,PEG 0.6 CTRL,PEG,False,True,False,,none,high,third CTRL photo for the PEG/non-BSA control condition (duplicate of 0143/0159); COOH/non-BSA CTRL for this third block not present in this manifest range
+0.6 CENTER/5 hrs/PXL_20260826_202536997.jpg,COOH 0.6 CTRL,COOH,False,True,False,,none,high,
+0.6 CENTER/5.5 hrs/PXL_20260826_204358999.jpg,PEG 0.6 BSA,PEG,True,False,,1.0,present,high,
+0.6 CENTER/5.5 hrs/PXL_20260826_204510170.jpg,PEG 0.6 BSA,PEG,True,False,,3.0,present,high,
+0.6 CENTER/5.5 hrs/PXL_20260826_204610506.jpg,PEG 0.6 BSA,PEG,True,False,,3.0,present,low,"strap strokes thick/overlapping ('W' shaped smear); count of 3 same as 0177 for same condition, verify manually"
+0.6 CENTER/5.5 hrs/PXL_20260826_204652802.jpg,COOH 0.6 BSA,COOH,True,False,,1.0,present,high,
+0.6 CENTER/5.5 hrs/PXL_20260826_204737771.jpg,COOH 0.6 BSA,COOH,True,False,,2.0,present,high,
+0.6 CENTER/5.5 hrs/PXL_20260826_204809585.jpg,COOH 0.6 BSA,COOH,True,False,,3.0,present,low,"sticker very blurry even in sticker_hi, coating read inferred from shape plus being part of a COOH/BSA repeat-1/2/3 run (0179-0181)"
+0.6 CENTER/5.5 hrs/PXL_20260826_204836689.jpg,PEG 0.6,PEG,False,False,,1.0,present,high,
+0.6 CENTER/5.5 hrs/PXL_20260826_204900330.jpg,PEG 0.6,PEG,False,False,,2.0,present,high,
+0.6 CENTER/5.5 hrs/PXL_20260826_204928024.jpg,PEG 0.6,PEG,False,False,,3.0,present,high,
+0.6 CENTER/5.5 hrs/PXL_20260826_204949874.jpg,COOH 0.6,COOH,False,False,,1.0,present,high,
+0.6 CENTER/5.5 hrs/PXL_20260826_205012206.jpg,COOH 0.6,COOH,False,False,,3.0,present,low,"tally/sticker nearly identical to 0187 (same wire/magnet arrangement) - possible duplicate photo of same sample, verify"
+0.6 CENTER/5.5 hrs/PXL_20260826_205042597.jpg,COOH 0.6,COOH,False,False,,3.0,present,low,"tally/sticker nearly identical to 0186 (same wire/magnet arrangement) - possible duplicate photo of same sample, verify"
+0.6 CENTER/5.5 hrs/PXL_20260826_205244450.jpg,PEG 0.6 BSA CTRL,PEG,True,True,True,,none,high,one of the 4 controls; CTRL written vertically as expected for BSA control
+0.6 CENTER/5.5 hrs/PXL_20260826_205301892.jpg,COOH 0.6 CTRL,COOH,False,True,False,,none,high,sticker/tally near-identical to 0175 - likely duplicate photo of same COOH non-BSA control
+0.6 CENTER/5.5 hrs/PXL_20260826_205322669.jpg,PEG 0.6 CTRL,PEG,False,True,False,,none,high,
+0.6 CENTER/5.5 hrs/PXL_20260826_205348944.jpg,COOH 0.6 BSA CTRL,COOH,True,True,True,,none,low,sticker blurry (0.6 digit and BSA faint) but vertical CTRL to the right of main text is legible; completes the 4th control combo (COOH+BSA)
+0.6 CENTER/6 hrs/PXL_20260826_211356855.jpg,PEG 0.6 BSA,PEG,True,False,,1.0,present,high,
+0.6 CENTER/6 hrs/PXL_20260826_211427203.jpg,PEG 0.6 BSA,PEG,True,False,,3.0,present,high,
+0.6 CENTER/6 hrs/PXL_20260826_211447863.jpg,PEG 0.6 BSA,PEG,True,False,,2.0,present,high,
+0.6 CENTER/6 hrs/PXL_20260826_211517646.jpg,COOH 0.6 BSA,COOH,True,False,,1.0,present,high,
+0.6 CENTER/6 hrs/PXL_20260826_211542690.jpg,COOH 0.6 BSA,COOH,True,False,,2.0,present,high,
+0.6 CENTER/6 hrs/PXL_20260826_211611789.jpg,COOH 0.6 BSA,COOH,True,False,,3.0,present,low,"sticker very blurry, read by analogy to adjacent COOH/BSA repeat set (0195-0197)"
+0.6 CENTER/6 hrs/PXL_20260826_211642406.jpg,PEG 0.6,PEG,False,False,,1.0,present,high,
+0.6 CENTER/6 hrs/PXL_20260826_211702516.jpg,PEG 0.6,PEG,False,False,,2.0,present,high,
+0.6 CENTER/6 hrs/PXL_20260826_211722705.jpg,PEG 0.6,PEG,False,False,,3.0,present,high,
+0.6 CENTER/6 hrs/PXL_20260826_211741154.jpg,COOH 0.6,COOH,False,False,,1.0,present,high,
+0.6 CENTER/6 hrs/PXL_20260826_211807434.jpg,COOH 0.6,COOH,False,False,,2.0,present,high,
+0.6 CENTER/6 hrs/PXL_20260826_211834760.jpg,COOH 0.6,COOH,False,False,,3.0,present,high,
+0.6 CENTER/6 hrs/PXL_20260826_212115678.jpg,PEG 0.6 BSA CTRL,PEG,True,True,True,,none,high,duplicate of 0188 (same PEG+BSA control)
+0.6 CENTER/6 hrs/PXL_20260826_212145360.jpg,COOH 0.6 CTRL,COOH,False,True,False,,none,high,duplicate of 0175/0189 (same COOH non-BSA control)
+0.6 CENTER/6 hrs/PXL_20260826_212213974.jpg,PEG 0.6 CTRL,PEG,False,True,False,,none,high,duplicate of 0190 (same PEG non-BSA control)
+0.6 CENTER/6 hrs/PXL_20260826_212258510.jpg,COOH 0.6 BSA CTRL,COOH,True,True,True,,none,low,"sticker blurry, duplicate of 0191 (same COOH+BSA control)"
+0.6 CENTER/1 hr/PXL_20260826_161255736.jpg,PEG 0.6 BSA,PEG,True,False,,3.0,present,high,added later by Steven; read directly in main session

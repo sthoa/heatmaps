@@ -15,29 +15,34 @@ import pandas as pd
 
 S = Path("/private/tmp/claude-501/-Users-steven-NP-Experiments/d38dc98f-cc81-4670-b3a2-b557500370b1/scratchpad/aug26")
 
-m = pd.read_csv(Path(__file__).parent / "classified26.csv", parse_dates=["capture_time"])
+cat = pd.read_csv(Path(__file__).parent / "photos26.csv", parse_dates=["capture_time"])
+cls = pd.read_csv(Path(__file__).parent / "classified26_bypath.csv")
+m = cat.merge(cls, on="path", how="left")
+missing = m[m.v_coating.isna()]
+if len(missing):
+    print("UNCLASSIFIED:", list(missing.path))
 m["idx"] = m.index
+m["coating"] = m.v_coating
+m["bsa"] = m.v_bsa.map({True: "BSA", False: "non-BSA"})
+m["control"] = m.v_control.fillna(False).astype(bool)
 m["tally"] = m["v_tally"]
 m["tally_changed"] = False
 m["tally_certainty"] = "high"
 m["duplicate_shot"] = False
 
-fixes = {}
-for f in sorted(glob.glob(str(S / "tallyfix" / "fixed_*.jsonl"))):
-    for line in open(f):
-        if line.strip():
-            r = json.loads(line)
-            fixes[int(r["idx"])] = r
-for i, r in fixes.items():
-    if i not in m.index:
+fixes = json.load(open(Path(__file__).parent / "tallyfix26_bypath.json"))
+m = m.set_index("path", drop=False)
+for p, r in fixes.items():
+    if p not in m.index:
         continue
-    old = m.at[i, "tally"]
+    old = m.at[p, "tally"]
     new = int(r["tally_fixed"])
     if pd.isna(old) or int(old) != new:
-        m.at[i, "tally_changed"] = True
-    m.at[i, "tally"] = new
-    m.at[i, "duplicate_shot"] = bool(r.get("duplicate", False))
-    m.at[i, "tally_certainty"] = r.get("certainty", "high")
+        m.at[p, "tally_changed"] = True
+    m.at[p, "tally"] = new
+    m.at[p, "duplicate_shot"] = bool(r.get("duplicate", False))
+    m.at[p, "tally_certainty"] = r.get("certainty", "high")
+m = m.reset_index(drop=True)
 
 # manual overrides (from direct inspection in the main session)
 mo = Path(__file__).parent / "manual_overrides26.json"
