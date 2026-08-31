@@ -1,54 +1,77 @@
-"""Render the cross-day comparison page (outputs/cross_day_comparison.html)."""
+"""Render the agarose-concentration comparison page (outputs/cross_day_comparison.html)."""
 import base64
 from pathlib import Path
 
 OUT = Path(__file__).parent / "outputs"
 img = base64.b64encode((OUT / "cross_day_comparison.png").read_bytes()).decode()
 
-ROWS = [
-    ("Plateau, mean of 5–6 h (L*)", [
-        ("coating, within 0.4% gel", "COOH − PEG", "+6.4", "0.39", 0),
-        ("coating, within 0.6% gel", "COOH − PEG", "+17.9", "0.22", 0),
-        ("gel stiffness, COOH", "0.4% − 0.6%", "+9.1", "0.48", 0),
-        ("gel stiffness, PEG", "0.4% − 0.6%", "+20.5", "0.054", 1),
-    ]),
-    ("Early rate, 0–3 h slope (L*/h)", [
-        ("coating, within 0.4% gel", "COOH − PEG", "+0.4", "0.89", 0),
-        ("coating, within 0.6% gel", "COOH − PEG", "+4.0", "0.26", 0),
-        ("gel stiffness, COOH", "0.4% − 0.6%", "+2.9", "0.33", 0),
-        ("gel stiffness, PEG", "0.4% − 0.6%", "+6.5", "0.14", 0),
-    ]),
+# 2x2 factorial, non-BSA large-magnet arms, n=12 series (cross_day_compare.py)
+FACTORIAL = [
+    ("Agarose 0.4% vs 0.6%", "+14.8 L*", "5.64", "0.045", 2),
+    ("Coating COOH vs PEG", "+12.2 L*", "3.82", "0.086", 1),
+    ("Coating &times; agarose interaction", "&mdash;", "0.85", "0.384", 0),
 ]
 
-def table():
+# plateau (5-6 h mean) per condition cell
+CELLS = [
+    ("Aug 23 &middot; 0.4% &middot; non-BSA &middot; large", "41.4", "35.0", "+6.4", 1),
+    ("Aug 26 &middot; 0.6% &middot; BSA &middot; large", "28.8", "22.7", "+6.1", 1),
+    ("Aug 26 &middot; 0.6% &middot; non-BSA &middot; large", "32.4", "14.4", "+17.9", 1),
+    ("Aug 23 &middot; 0.4% &middot; non-BSA &middot; small", "7.8", "11.8", "&minus;4.0", 0),
+]
+
+BACK = [
+    ("Front, magnet &minus; control", "+0.22 mm", "+0.59 mm", "&minus;0.37", "0.61"),
+    ("Front, absolute", "3.66 mm", "3.78 mm", "&minus;0.11", "0.76"),
+    ("Centroid, magnet &minus; control", "&minus;0.36 mm", "+0.19 mm", "&minus;0.55", "0.17"),
+]
+
+
+def factorial_rows():
     out = []
-    for head, rows in ROWS:
-        out.append(f'<tr class="grp"><th colspan="4">{head}</th></tr>')
-        for what, contrast, diff, p, near in rows:
-            cls = ' class="near"' if near else ""
-            out.append(f'<tr><td>{what}</td><td class="mono dim">{contrast}</td>'
-                       f'<td class="mono num">{diff}</td><td class="mono num"{cls}>{p}</td></tr>')
+    for what, eff, F, p, strength in FACTORIAL:
+        cls = ' class="sig"' if strength == 2 else (' class="near"' if strength == 1 else "")
+        out.append(f'<tr><td>{what}</td><td class="mono num">{eff}</td>'
+                   f'<td class="mono num dim">{F}</td><td class="mono num"{cls}>{p}</td></tr>')
     return "\n".join(out)
+
+
+def cell_rows():
+    out = []
+    for cell, cooh, peg, diff, ok in CELLS:
+        cls = "" if ok else ' class="warn"'
+        out.append(f'<tr><td>{cell}</td><td class="mono num">{cooh}</td>'
+                   f'<td class="mono num">{peg}</td><td class="mono num"{cls}>{diff}</td>'
+                   f'<td{cls}>{"COOH ahead" if ok else "PEG ahead"}</td></tr>')
+    return "\n".join(out)
+
+
+def back_rows():
+    return "\n".join(
+        f'<tr><td>{q}</td><td class="mono num">{a}</td><td class="mono num">{b}</td>'
+        f'<td class="mono num">{d}</td><td class="mono num">{p}</td></tr>'
+        for q, a, b, d, p in BACK)
+
 
 HTML = f"""<title>0.4% vs 0.6% Agarose</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,500;0,600;1,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 :root {{
-  --page:#F6F5F2; --surface:#FDFDFC; --sunk:#F0EFEB;
+  --page:#F6F5F2; --surface:#FDFDFC;
   --ink:#1A1A22; --ink2:#5C5C6A; --rule:rgba(26,26,34,.13);
   --accent:#4A3F8C; --caution:#8A4E14;
   --soft:#C0392B; --stiff:#1F6FB2;
 }}
 @media (prefers-color-scheme: dark) {{
   :root:not([data-theme="light"]) {{
-    --page:#121218; --surface:#1C1C24; --sunk:#191920;
+    --page:#121218; --surface:#1C1C24;
     --ink:#E9E8EE; --ink2:#A29FB0; --rule:rgba(233,232,238,.15);
     --accent:#A497EC; --caution:#D79A5E;
     --soft:#E9705F; --stiff:#5FA8E0;
   }}
 }}
 :root[data-theme="dark"] {{
-  --page:#121218; --surface:#1C1C24; --sunk:#191920;
+  --page:#121218; --surface:#1C1C24;
   --ink:#E9E8EE; --ink2:#A29FB0; --rule:rgba(233,232,238,.15);
   --accent:#A497EC; --caution:#D79A5E;
   --soft:#E9705F; --stiff:#5FA8E0;
@@ -76,19 +99,20 @@ figure img {{ width:100%; display:block; }}
 figcaption {{ font-size:13.5px; color:var(--ink2); line-height:1.5; margin-top:13px;
   padding-top:12px; border-top:1px solid var(--rule); }}
 .tablewrap {{ overflow-x:auto; }}
-table {{ border-collapse:collapse; width:100%; min-width:520px; font-size:14.5px; }}
+table {{ border-collapse:collapse; width:100%; min-width:540px; font-size:14.5px; }}
 caption {{ text-align:left; font-size:13.5px; color:var(--ink2); padding-bottom:10px; }}
 th, td {{ padding:8px 16px 8px 0; border-bottom:1px solid var(--rule); text-align:left;
   vertical-align:baseline; }}
-tr.grp th {{ font-family:"IBM Plex Sans"; font-size:11.5px; font-weight:600; letter-spacing:.1em;
-  text-transform:uppercase; color:var(--accent); padding-top:20px; border-bottom-color:var(--ink2); }}
 thead th {{ font-size:12px; font-weight:600; letter-spacing:.05em; text-transform:uppercase;
   color:var(--ink2); }}
 .mono {{ font-family:"IBM Plex Mono", ui-monospace, monospace; }}
-.num {{ text-align:right; font-variant-numeric:tabular-nums; padding-right:0; }}
-.dim {{ color:var(--ink2); font-size:13px; }}
+.num {{ text-align:right; font-variant-numeric:tabular-nums; }}
+.dim {{ color:var(--ink2); }}
+.sig {{ color:var(--accent); font-weight:600; }}
 .near {{ color:var(--caution); font-weight:500; }}
-.split {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:26px; }}
+.warn {{ color:var(--caution); }}
+.good {{ color:var(--accent); }}
+.split {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:26px; }}
 .card {{ background:var(--surface); border:1px solid var(--rule); border-radius:5px; padding:20px 22px; }}
 .card h3 {{ font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
   margin:0 0 12px; color:var(--accent); }}
@@ -96,17 +120,12 @@ thead th {{ font-size:12px; font-weight:600; letter-spacing:.05em; text-transfor
 .card ul {{ margin:0; padding-left:18px; display:flex; flex-direction:column; gap:9px; font-size:15px; }}
 .rail {{ border-left:2px solid var(--accent); padding:2px 0 2px 20px; }}
 .matched {{ display:grid; grid-template-columns:auto 1fr 1fr; gap:0 22px; font-size:14.5px;
-  max-width:640px; }}
-.good {{ color:var(--accent); }}
-.warn {{ color:var(--caution); }}
-tr.grp2 td {{ padding-top:16px; border-top:1px solid var(--ink2); color:var(--ink2); }}
+  max-width:660px; }}
 .matched div {{ padding:7px 0; border-bottom:1px solid var(--rule); }}
 .matched .h {{ font-size:11.5px; font-weight:600; letter-spacing:.09em; text-transform:uppercase;
   color:var(--ink2); }}
 .matched .k {{ color:var(--ink2); }}
-.matched .v {{ font-family:"IBM Plex Mono", monospace; }}
-.diff {{ color:var(--soft); font-weight:500; }}
-.diff2 {{ color:var(--stiff); font-weight:500; }}
+.matched .v {{ font-family:"IBM Plex Mono", monospace; font-size:13.5px; }}
 footer {{ border-top:1px solid var(--rule); padding-top:22px; font-size:14px; color:var(--ink2); }}
 footer a {{ color:var(--accent); text-decoration:none; border-bottom:1px solid var(--rule); }}
 footer a:hover, footer a:focus-visible {{ border-bottom-color:var(--accent); }}
@@ -115,114 +134,133 @@ footer a:hover, footer a:focus-visible {{ border-bottom-color:var(--accent); }}
 <main>
 
 <header class="col">
-  <p class="eyebrow">Nanoparticle transport · agarose concentration</p>
+  <p class="eyebrow">Nanoparticle transport &middot; agarose concentration</p>
   <h1>Does stiffer gel slow the particles down?</h1>
-  <p class="stand">The question can be asked twice — once in the centre-injection runs and once in
-  the back-injection run. The two geometries give different answers, and the reason they differ is
-  the most useful thing on this page.</p>
+  <p class="stand">Yes in the centre-injection runs, where the effect reaches significance once the
+  design is analysed as the 2&times;2 it is. The back-injection run cannot answer the question &mdash;
+  and the reason it cannot is worth as much as the answer.</p>
 </header>
 
 <figure>
   <img src="data:image/png;base64,{img}" alt="Asymmetry versus time for 0.4% and 0.6% agarose in centre injection, and front position versus time in back injection">
-  <figcaption><strong>Top — centre injection (Aug 23 vs Aug 26).</strong> Asymmetry: mean
+  <figcaption><strong>Top &mdash; centre injection (Aug 23 vs Aug 26).</strong> Asymmetry: mean
   nanoparticle darkness on the magnet side of the gap minus the far side. Bold lines are the mean of
   three repeats, faint lines the individual repeats, grey the envelope of all four no-magnet
-  controls. <strong>Bottom — back injection (Aug 27).</strong> Front position: the deepest point
-  still carrying 20% of peak darkness, each magnet series minus the mean control of its own
-  BSA×coating cell. Bands are ±1 SEM across 12 series. Red is 0.4% and blue 0.6% in both panels.</figcaption>
+  controls. <strong>Bottom &mdash; back injection (Aug 27).</strong> Front position: the deepest
+  point still carrying 20% of peak darkness, each magnet series minus the mean control of its own
+  BSA&times;coating cell, &plusmn;1 SEM across 12 series. Red is 0.4% and blue 0.6% in both panels.</figcaption>
 </figure>
 
-<section class="col">
-  <h2>Two ways to ask it, and they are not equally good</h2>
-  <p>The back-injection comparison is the better experiment by design — both concentrations ran in
-  the <em>same session</em>, balanced across BSA and coating, so there is no between-day confound and
-  four times the series. The centre-injection comparison is assembled from two different days.</p>
-  <div class="matched three">
-    <div class="h"></div><div class="h">Centre injection</div><div class="h">Back injection</div>
-    <div class="k">Source</div><div class="v">Aug 23 vs Aug 26</div><div class="v good">Aug 27, one day</div>
-    <div class="k">Confounding</div><div class="v warn">gel batch, lighting</div><div class="v good">none — same session</div>
-    <div class="k">Series per concentration</div><div class="v warn">3</div><div class="v good">12</div>
-    <div class="k">Metric</div><div class="v">asymmetry (L*)</div><div class="v">front position (mm)</div>
-    <div class="k">Transport observed</div><div class="v good">13–42 L*, plateaus by 3 h</div><div class="v warn">≤4 mm over 21.5 h</div>
-    <div class="k"><strong>Result</strong></div><div class="v">0.4% &gt; 0.6%, n.s.</div><div class="v">no difference</div>
-  </div>
-</section>
-
 <section>
-  <h2 class="col">Centre injection — a consistent ordering that misses significance</h2>
+  <h2 class="col">Centre injection, analysed as a factorial rather than as pairwise tests</h2>
   <p class="col">Restricting Aug 26 to its non-BSA arms leaves agarose concentration as the only
-  difference from Aug 23: both are centre injection, 6 h, 13 timepoints at 30 min, PEG and COOH,
-  large magnet, identical warp geometry. Softer gel transports further in both coatings, with no
-  crossing after 1 h.</p>
+  difference from Aug 23: both centre injection, 6 h, 13 timepoints at 30 min, PEG and COOH, large
+  magnet, identical warp geometry. Four cells of three repeats is a 2&times;2 design, so it is tested
+  as one. That pools the residual variance and gives 8 degrees of freedom instead of the 2&ndash;4
+  that separate pairwise t-tests were working with &mdash; which is why the stiffness effect surfaces
+  here and did not before.</p>
   <div class="tablewrap">
   <table>
-    <caption>Welch t-tests on per-series values, n=3 per group. Positive means the first term
-    transported further.</caption>
-    <thead><tr><th>Contrast</th><th>Direction</th><th class="num">Difference</th><th class="num">p</th></tr></thead>
+    <caption>Two-way ANOVA on the 5&ndash;6 h plateau of each series. Non-BSA, large magnet,
+    n=12 series.</caption>
+    <thead><tr><th>Term</th><th class="num">Effect</th><th class="num">F</th><th class="num">p</th></tr></thead>
     <tbody>
-{table()}
+{factorial_rows()}
     </tbody>
   </table>
   </div>
+  <p class="col" style="margin-top:18px">Within the 0.6% run on its own &mdash; Aug 26, one day, BSA
+  as a blocking factor, n=12 &mdash; COOH leads PEG by <span class="mono">+12.0&nbsp;L*</span>,
+  <span class="mono">F=4.44, p=0.064</span>, 95% CI <span class="mono">[&minus;0.9, +24.9]</span>.
+  The BSA block itself is inert (<span class="mono">p=0.69</span>), which is what justifies pooling
+  the two albumin states.</p>
 </section>
 
 <section>
-  <h2 class="col">Back injection — better powered, and it finds nothing</h2>
-  <p class="col">Front position was chosen over a mass-weighted depth before looking at the
-  comparison, because back injection leaves a large reservoir pile against the gap: a magnet arm that
-  has drawn particles out of the pile into a long tail scores <em>lower</em> on a centroid than a
-  control that kept everything heaped at the boundary. As a check that it measures the right thing,
-  the front metric independently recovers this run's known magnet effect, <span class="mono">+0.41 mm</span>
-  against a published <span class="mono">+0.44 mm</span>.</p>
+  <h2 class="col">Does COOH beat PEG in every cell? Three times out of four</h2>
   <div class="tablewrap">
   <table>
-    <caption>Magnet series averaged over 12–21.5 h, each minus the mean control of its own
-    BSA×coating cell. n=12 series per concentration.</caption>
-    <thead><tr><th>Quantity</th><th>0.4%</th><th>0.6%</th><th class="num">Difference</th><th class="num">p</th></tr></thead>
+    <caption>Plateau asymmetry (5&ndash;6 h mean, L*) per condition cell, n=3 series each.</caption>
+    <thead><tr><th>Cell</th><th class="num">COOH</th><th class="num">PEG</th>
+      <th class="num">COOH &minus; PEG</th><th>Direction</th></tr></thead>
     <tbody>
-      <tr><td>Front, magnet − control</td><td class="mono">+0.22 mm</td><td class="mono">+0.59 mm</td><td class="mono num">−0.37</td><td class="mono num">0.61</td></tr>
-      <tr><td>Front, absolute</td><td class="mono">3.66 mm</td><td class="mono">3.78 mm</td><td class="mono num">−0.11</td><td class="mono num">0.76</td></tr>
-      <tr><td>Centroid, magnet − control</td><td class="mono">−0.36 mm</td><td class="mono">+0.19 mm</td><td class="mono num">−0.55</td><td class="mono num">0.17</td></tr>
-      <tr class="grp2"><td>Magnet effect itself, both concentrations</td><td class="mono" colspan="2">+0.41 mm (n=24)</td><td class="mono num">—</td><td class="mono num">0.26</td></tr>
+{cell_rows()}
     </tbody>
   </table>
   </div>
+  <p class="col" style="margin-top:14px">The exception is the small-magnet arm, and it is the cell
+  with almost no transport to compare &mdash; 7.8 and 11.8&nbsp;L* against 22.7 to 41.4 everywhere
+  else. That is the same floor problem that makes the back-injection run uninformative, so it is weak
+  evidence rather than a clean contradiction. A sign test over four cells has no power to settle it
+  either way (<span class="mono">p=0.31</span>).</p>
 </section>
 
 <section class="col rail">
-  <h2>Why the better experiment is the less informative one</h2>
-  <p>The last row of that table is the explanation. On Aug 27 the magnet effect itself is only
-  +0.41 mm and does not clear significance — the bulk of the particles never left the first few
-  millimetres in 21.5 hours. Asking whether gel stiffness <em>modulates</em> that effect means
-  looking for a difference in something that is barely present.</p>
-  <p>The centre-injection runs have room to show it: asymmetry climbs to 13–42 L* and plateaus
-  within three hours, an order of magnitude more dynamic range. So the honest reading is not that
-  the two geometries disagree about gel stiffness. It is that only one of them moved enough
-  particles for the question to be answerable, and that one is also the one with n=3 and a
-  between-day confound.</p>
+  <h2>What survives, and what does not</h2>
+  <p><strong>The gel-stiffness effect does reach significance</strong> once the design is analysed as
+  the factorial it is: <span class="mono">p=0.045</span>. Softer gel transported further in both
+  coatings, at every timepoint after 1 h, with no crossing. But <em>agarose</em> and <em>day</em> are
+  the same variable in this comparison &mdash; 0.4% is Aug 23, 0.6% is Aug 26 &mdash; so the p-value
+  does not rule out a gel batch or session-lighting difference. No amount of analysis fixes that.</p>
+  <p><strong>The coating effect is marginal and directionally consistent:</strong>
+  <span class="mono">p=0.086</span> across the factorial, <span class="mono">p=0.064</span> within the
+  0.6% run alone, COOH ahead in three of the four cells.</p>
+  <p><strong>The claim that PEG is hindered <em>more</em> at 0.6% is not supported.</strong> The
+  coating gap does look wider there &mdash; +17.9&nbsp;L* against +6.4 &mdash; but that comparison is
+  the interaction term, and it tests at <span class="mono">p=0.38</span>. Describing the pattern is
+  fair; asserting that the two concentrations differ in how much coating matters is not.</p>
+</section>
+
+<section>
+  <h2 class="col">Why the better-designed experiment answered nothing</h2>
+  <p class="col">Aug 27 ran both concentrations in one session, balanced across BSA and coating, with
+  12 magnet series per concentration instead of 3 &mdash; no between-day confound and four times the
+  material. It still finds nothing, and the last row explains why.</p>
+  <div class="tablewrap">
+  <table>
+    <caption>Back injection, magnet series averaged over 12&ndash;21.5 h, each minus the mean control
+    of its own BSA&times;coating cell. n=12 series per concentration.</caption>
+    <thead><tr><th>Quantity</th><th class="num">0.4%</th><th class="num">0.6%</th>
+      <th class="num">Difference</th><th class="num">p</th></tr></thead>
+    <tbody>
+{back_rows()}
+    <tr><td class="dim">Magnet effect itself, both concentrations</td>
+      <td class="mono num dim" colspan="2">+0.41 mm (n=24)</td>
+      <td class="mono num dim">&mdash;</td><td class="mono num warn">0.26</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="col" style="margin-top:16px">On Aug 27 the magnet effect itself is only +0.41&nbsp;mm and
+  does not clear significance: the particles barely left the first few millimetres in 21.5 hours.
+  Asking whether gel stiffness modulates that means looking for a difference in something that is
+  barely present. Centre injection reaches 13&ndash;42&nbsp;L* and plateaus within three hours, an
+  order of magnitude more dynamic range. The two geometries are not in conflict &mdash; only one of
+  them moved enough particles for the question to be answerable.</p>
 </section>
 
 <section class="split">
   <div class="card">
     <h3>Defensible in a write-up</h3>
     <ul>
-      <li>Every centre-injection magnet arm separates cleanly from the control envelope, which stays
-      within ±4.4 L* for six hours on both days.</li>
-      <li>Softer gel transports further in both coatings at every timepoint after 1 h — a consistent
-      ordering, reported as such.</li>
-      <li>Back injection shows no stiffness difference, in the run that had the power to detect one
-      had the transport been there.</li>
+      <li>Softer gel transported further in both coatings &mdash; significant in the factorial
+      (<span class="mono">p=0.045</span>), with the day confound stated alongside it.</li>
+      <li>COOH transported further than PEG in three of four cells, and by
+      <span class="mono">+12.0&nbsp;L*</span> within the 0.6% run
+      (<span class="mono">p=0.064</span>).</li>
+      <li>Every magnet arm separates cleanly from the control envelope, which stays within
+      &plusmn;4.4&nbsp;L* for six hours across both days.</li>
     </ul>
   </div>
   <div class="card no">
     <h3>Needs the caveat attached</h3>
     <ul>
-      <li>No contrast on this page reaches p&lt;0.05. The closest is PEG 0.4% vs 0.6% at
-      <span class="mono">p=0.054</span>.</li>
-      <li>Repeat scatter is the limit: one 0.6% COOH repeat plateaus at 12.8 L*, another at 48.1.</li>
-      <li>The apparent coating×stiffness interaction — coating irrelevant at 0.4%, decisive at 0.6%
-      — is the weakest claim here at <span class="mono">p=0.22</span>. An interaction needs more
-      evidence than a main effect, not less.</li>
+      <li>&ldquo;PEG is hindered more at 0.6%&rdquo; is an interaction, and it tests at
+      <span class="mono">p=0.38</span>. Report the pattern, not the comparison.</li>
+      <li>Agarose concentration and run day are perfectly confounded in this comparison.</li>
+      <li>The small-magnet cell reverses the coating ordering &mdash; in the one cell where transport
+      was near the floor.</li>
+      <li>Repeat scatter is the binding limit: one 0.6% COOH repeat plateaus at 12.8&nbsp;L*, another
+      at 48.1.</li>
     </ul>
   </div>
 </section>
@@ -230,7 +268,8 @@ footer a:hover, footer a:focus-visible {{ border-bottom-color:var(--accent); }}
 <footer class="col">
   <p>Computed by <span class="mono">cross_day_compare.py</span> and
   <span class="mono">back_depth_compare.py</span> from 405 centre-injection and 572 back-injection
-  frames. Per-day heatmaps are unchanged and remain the primary record:
+  frames; per-series values in <span class="mono">centre_plateau_by_series.csv</span>. Per-day
+  heatmaps are unchanged and remain the primary record:
   <a href="https://claude.ai/code/artifact/bfbbd924-d55b-411c-b54a-6c53b0541676">Aug&nbsp;23</a>,
   <a href="https://claude.ai/code/artifact/13f18308-9059-4fb3-a44f-672c425ffd74">Aug&nbsp;26</a>,
   <a href="https://claude.ai/code/artifact/b3891b33-43e9-4880-b0cf-80f59790fb3e">Aug&nbsp;27</a>.</p>

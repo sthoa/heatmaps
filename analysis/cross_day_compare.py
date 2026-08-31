@@ -133,8 +133,9 @@ def panel_asymmetry(ax, df):
     ax.axhline(0, color="#888", lw=.8, zorder=0)
     ax.set_xlabel("hours after magnet applied", fontsize=10)
     ax.set_ylabel("asymmetry  (magnet side \u2212 far side, L*)", fontsize=10)
-    ax.set_title("Centre injection, Aug 23 vs Aug 26 \u2014 softer gel transports further in both "
-                 "coatings,\nconsistently but not significantly at n=3 (best contrast p=0.054)",
+    ax.set_title("Centre injection \u2014 in a 2\u00d72 factorial the gel-stiffness effect holds "
+                 "(p=0.045) and COOH over PEG\nis marginal (p=0.086); the wider coating gap at 0.6% "
+                 "is not supported (interaction p=0.38)",
                  fontsize=11, pad=9, loc="left")
     ax.legend(fontsize=8.6, frameon=False, loc="upper left")
     ax.set_xlim(-0.15, 6.15); ax.grid(alpha=.16, lw=.6)
