@@ -205,11 +205,11 @@ class SeriesGeom:
         if self.rimR0 is not None:
             Lm = gaussian_filter1d(
                 cv2.cvtColor(img, cv2.COLOR_BGR2LAB)[..., 0].astype(np.float32)[self.Y0 + 30:self.Y1 - 30, :].mean(axis=0), 3)
-            rimR = rim_bright_start(Lm, self.rimR0 - 60, min(466, self.rimR0 + 30))
+            rimR = rim_bright_start(Lm, self.rimR0 - 70, min(474, self.rimR0 + 75))
             if rimR is not None:
                 if abs(rimR - self.rimR0) > 2:
                     sx = (self.rimR0 - self.rimedge0) / max(rimR - self.rimedge0, 1)
-                    if 0.85 < sx < 1.18:
+                    if 0.82 < sx < 1.2:
                         Mx = np.float32([[sx, 0, self.rimedge0 - sx * self.rimedge0], [0, 1, 0]])
                         img = cv2.warpAffine(img, Mx, (480, 480), flags=cv2.INTER_LINEAR)
         # fine stage: align the rim's inner edge (steepest white->dark fall)
