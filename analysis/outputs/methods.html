@@ -1,0 +1,590 @@
+<title>How the Numbers Were Made</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,500;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --page:#FBFAF8; --surface:#FFFFFF; --sunk:#F2F1EC;
+  --ink:#16171B; --ink2:#585A62; --ink3:#8A8C93;
+  --rule:rgba(22,23,27,.12); --rule2:rgba(22,23,27,.2);
+  --accent:#1F6F5C; --caution:#8A5A14; --alert:#9B3226;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page:#101113; --surface:#191A1D; --sunk:#151619;
+    --ink:#E9E9EC; --ink2:#A3A5AC; --ink3:#7A7C84;
+    --rule:rgba(233,233,236,.14); --rule2:rgba(233,233,236,.24);
+    --accent:#5FC0A5; --caution:#D9A356; --alert:#E08072;
+  }
+}
+:root[data-theme="dark"] {
+  --page:#101113; --surface:#191A1D; --sunk:#151619;
+  --ink:#E9E9EC; --ink2:#A3A5AC; --ink3:#7A7C84;
+  --rule:rgba(233,233,236,.14); --rule2:rgba(233,233,236,.24);
+  --accent:#5FC0A5; --caution:#D9A356; --alert:#E08072;
+}
+* { box-sizing:border-box; }
+body { background:var(--page); color:var(--ink); margin:0;
+  padding:clamp(26px,4.5vw,56px) 20px 90px;
+  font:16px/1.65 "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing:antialiased; }
+main { max-width:1080px; margin:0 auto; display:flex; flex-direction:column; gap:44px; }
+.col { max-width:68ch; }
+
+.eyebrow { font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--accent); margin:0 0 12px; }
+h1 { font-family:Spectral, Georgia, serif; font-weight:600; font-size:clamp(31px,4.6vw,46px);
+  line-height:1.12; letter-spacing:-.012em; margin:0 0 16px; text-wrap:balance; }
+.stand { font-family:Spectral, Georgia, serif; font-size:19.5px; line-height:1.5; font-style:italic;
+  color:var(--ink2); margin:0; text-wrap:balance; }
+
+/* stage layout: number in the gutter, content beside it */
+.stage { display:grid; grid-template-columns:64px minmax(0,1fr); gap:0 22px; align-items:start; }
+.stage > .n { font-family:"IBM Plex Mono", monospace; font-size:13px; font-weight:500;
+  color:var(--accent); padding-top:7px; border-top:2px solid var(--accent); letter-spacing:.04em; }
+.stage > .body { border-top:1px solid var(--rule2); padding-top:14px; min-width:0; }
+.stage h2 { font-family:Spectral, Georgia, serif; font-weight:600; font-size:25px;
+  letter-spacing:-.008em; margin:0 0 4px; text-wrap:balance; }
+.io { font-family:"IBM Plex Mono", monospace; font-size:12.5px; color:var(--ink3);
+  margin:0 0 16px; }
+.io b { color:var(--ink2); font-weight:500; }
+p { margin:0 0 15px; max-width:68ch; }
+p:last-child { margin-bottom:0; }
+h3 { font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--accent); margin:26px 0 10px; }
+
+.mono { font-family:"IBM Plex Mono", ui-monospace, monospace; }
+code { font-family:"IBM Plex Mono", monospace; font-size:13.5px; background:var(--sunk);
+  padding:1px 5px; border-radius:3px; }
+
+.params { display:grid; grid-template-columns:auto 1fr; gap:0 20px; font-size:14px;
+  max-width:640px; margin:4px 0 16px; }
+.params div { padding:6px 0; border-bottom:1px solid var(--rule); }
+.params .k { font-family:"IBM Plex Mono", monospace; color:var(--accent); white-space:nowrap; }
+
+.tablewrap { overflow-x:auto; margin:6px 0 16px; }
+table { border-collapse:collapse; width:100%; min-width:480px; font-size:14.5px; }
+caption { text-align:left; font-size:13px; color:var(--ink2); padding-bottom:9px; }
+th, td { padding:7px 16px 7px 0; border-bottom:1px solid var(--rule); text-align:left;
+  vertical-align:baseline; }
+thead th { font-size:11.5px; font-weight:600; letter-spacing:.05em; text-transform:uppercase;
+  color:var(--ink2); }
+.num { text-align:right; font-variant-numeric:tabular-nums; font-family:"IBM Plex Mono", monospace; }
+.dim { color:var(--ink2); }
+.sig { color:var(--accent); font-weight:600; }
+.warn { color:var(--caution); }
+.bad { color:var(--alert); }
+
+.callout { background:var(--surface); border:1px solid var(--rule); border-left:3px solid var(--accent);
+  border-radius:4px; padding:16px 20px; margin:18px 0; max-width:68ch; }
+.callout.caution { border-left-color:var(--caution); }
+.callout h4 { font-size:11.5px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--accent); margin:0 0 8px; }
+.callout.caution h4 { color:var(--caution); }
+.callout p { font-size:15px; margin-bottom:10px; }
+
+pre.mermaid { background:var(--surface); border:1px solid var(--rule); border-radius:5px;
+  padding:20px; overflow-x:auto; text-align:center; margin:0; }
+
+.qa { display:flex; flex-direction:column; gap:0; }
+.qa details { border-bottom:1px solid var(--rule); }
+.qa summary { cursor:pointer; padding:15px 0; font-weight:500; font-size:16.5px;
+  list-style:none; display:flex; gap:12px; align-items:baseline; }
+.qa summary::-webkit-details-marker { display:none; }
+.qa summary::before { content:"→"; color:var(--accent); font-family:"IBM Plex Mono", monospace;
+  flex:none; transition:transform .18s ease; }
+.qa details[open] summary::before { transform:rotate(90deg); }
+.qa summary:hover { color:var(--accent); }
+.qa .a { padding:0 0 18px 26px; color:var(--ink2); }
+.qa .a p { font-size:15.5px; }
+.qa .a strong { color:var(--ink); }
+
+ul, ol { margin:0 0 15px; padding-left:20px; display:flex; flex-direction:column; gap:8px;
+  max-width:68ch; }
+li::marker { color:var(--accent); }
+
+footer { border-top:1px solid var(--rule); padding-top:24px; font-size:14px; color:var(--ink2); }
+footer a { color:var(--accent); text-decoration:none; border-bottom:1px solid var(--rule); }
+footer a:hover, footer a:focus-visible { border-bottom-color:var(--accent); }
+:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+@media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
+@media (max-width:640px) {
+  .stage { grid-template-columns:1fr; gap:0; }
+  .stage > .n { border-top:2px solid var(--accent); padding-bottom:10px; }
+  .stage > .body { border-top:none; padding-top:0; }
+}
+</style>
+<main>
+
+<header class="col">
+  <p class="eyebrow">Magnetic nanoparticle transport in agarose &middot; methods</p>
+  <h1>How the numbers were made</h1>
+  <p class="stand">Every step from a phone photo to <span class="mono">p&nbsp;=&nbsp;0.045</span>:
+  what was measured, what was assumed, what was checked, and where the analysis is weak. Written so
+  that nothing in the pipeline is a black box you have to take on trust.</p>
+</header>
+
+<pre class="mermaid">
+flowchart TD
+  A["1005 phone photos<br/>3 run days"] --> B["Catalogue<br/>timestamp &rarr; timepoint"]
+  B --> C["Read labels<br/>coating, BSA, repeat, magnet"]
+  C --> D["Downscale<br/>long edge 1100 px"]
+  D --> E["Find the agarose block<br/>method differs per day"]
+  E --> F["Warp to a square<br/>480 &times; 480 px = 10 &times; 10 mm"]
+  F --> G["Darkness field<br/>255 &minus; L*, binned, floor removed"]
+  G --> H["Block heatmaps<br/>shared 0&ndash;55 scale"]
+  G --> I["Asymmetry<br/>magnet side &minus; far side"]
+  I --> J["Plateau per series<br/>mean of 5&ndash;6 h"]
+  J --> K["2 &times; 2 ANOVA<br/>agarose &times; coating"]
+</pre>
+
+<section class="stage">
+  <div class="n">STAGE 1</div>
+  <div class="body">
+    <h2>What the raw data actually is</h2>
+    <p class="io"><b>In:</b> phone photos &nbsp;·&nbsp; <b>Out:</b> a table of 1005 rows</p>
+    <p>Every measurement in this project comes from top-view photographs. Nothing was measured with
+    an instrument; the camera <em>is</em> the instrument. That is the single most important thing to
+    understand about the analysis, and most of the pipeline exists to make a phone camera behave like
+    a repeatable one.</p>
+    <div class="tablewrap">
+    <table>
+      <caption>The three run days as analysed.</caption>
+      <thead><tr><th>Day</th><th>Design</th><th class="num">Photos</th><th class="num">Timepoints</th><th class="num">Series</th></tr></thead>
+      <tbody>
+        <tr><td>Aug 23</td><td>0.4% agarose, non-BSA, <b>centre</b> injection, large vs small magnet, 6 h</td><td class="num">196</td><td class="num">13</td><td class="num">14</td></tr>
+        <tr><td>Aug 26</td><td>0.6% agarose, BSA vs non-BSA, <b>centre</b> injection, large magnet, 6 h</td><td class="num">209</td><td class="num">13</td><td class="num">16</td></tr>
+        <tr><td>Aug 27</td><td>0.4 &amp; 0.6%, BSA vs non-BSA, <b>back</b> injection, 21.5 h</td><td class="num">600</td><td class="num">12</td><td class="num">48</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p>A &ldquo;series&rdquo; is one physical sample followed through time &mdash; for example
+    <code>COOH_non-BSA_r2</code>. Each series contributes one point to any statistical test, never
+    one point per photo. Photos of the same sample at different times are repeated measurements of
+    one thing, not independent samples, and treating them as independent would inflate every
+    significance figure enormously.</p>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="n">STAGE 2</div>
+  <div class="body">
+    <h2>Turning file names into timepoints</h2>
+    <p class="io"><b>In:</b> <code>PXL_20260823_143012.jpg</code> &nbsp;·&nbsp; <b>Out:</b> hours since the magnet went on</p>
+    <p>Phone filenames carry a capture timestamp. The catalogue scripts parse it, take the earliest
+    magnet-attached photo of each run as <span class="mono">t = 0</span>, and express every other
+    photo as elapsed hours. Photos were then snapped to the nominal timepoint they belong to (0, 0.5,
+    1.0&nbsp;h &hellip;), because you photographed each condition in sequence and the real capture
+    times within one round differ by a few minutes.</p>
+    <p>Timepoints are therefore accurate to roughly the time it took to photograph one full round,
+    not to the second. Over a 6-hour experiment with 30-minute sampling this is immaterial; it would
+    matter if we were quoting a rate over minutes.</p>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="n">STAGE 3</div>
+  <div class="body">
+    <h2>Reading which sample each photo shows</h2>
+    <p class="io"><b>In:</b> photo &nbsp;·&nbsp; <b>Out:</b> coating, BSA state, repeat number, magnet present</p>
+    <p>The condition was never recorded in a spreadsheet &mdash; it exists only as writing in the
+    photograph. So the labels were read from the images themselves: coating and BSA state from the
+    marker text on the sticker, repeat number from the tally marks on the magnet strap, magnet
+    presence from the photo itself.</p>
+    <p>Two features of the rig made this hard, and both were dealt with explicitly:</p>
+    <ul>
+      <li><b>Red marker on an orange sticker</b> has almost no contrast. Before reading, each sticker
+      crop was transformed to <code>a* &minus; 0.8&thinsp;b*</code> in LAB space, percentile-stretched,
+      inverted and CLAHE-equalised. That turns marginal text crisp.</li>
+      <li><b>The ribbed magnet strap splits one tally stroke into two or three thin lines</b>, so
+      naive stroke counting over-reads. Counts were made on stroke <em>groups</em>, then refereed.</li>
+    </ul>
+    <h3>How label errors were caught</h3>
+    <p>The design provides a constraint that the reading process does not know about: at every
+    timepoint, the three repeats of a condition must be exactly {1,&nbsp;2,&nbsp;3}. Any trio that
+    came back as {1,&nbsp;2,&nbsp;2} or {2,&nbsp;3,&nbsp;3} is provably wrong, and was re-read
+    against reference crops of each repeat's own tally mark. On Aug 26, 23 of 52 trios needed this
+    referee pass and 25 individual readings were corrected &mdash; nearly all &ldquo;II read as
+    III&rdquo;. Every trio on every day now resolves cleanly.</p>
+    <div class="callout caution">
+      <h4>A real error this caught</h4>
+      <p>At the 1 h timepoint on Aug 26, the PEG BSA trio had been read one-too-high, which made it
+      look as though repeat 1 was missing. You identified that repeat 3 was the actual gap and
+      supplied the photo. After that, every classification was re-keyed by <b>file path</b> rather
+      than by row index &mdash; adding one photo shifts every subsequent index and would silently
+      reassign conditions to the wrong images.</p>
+    </div>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="n">STAGE 4</div>
+  <div class="body">
+    <h2>Finding the agarose block in the photo</h2>
+    <p class="io"><b>In:</b> photo, downscaled to 1100 px on the long edge &nbsp;·&nbsp; <b>Out:</b> four corner coordinates</p>
+    <p>To compare a spot in one photo with the same spot in another, the block has to be located in
+    both. Each day needed a different method, because each day's rig offers different reliable
+    features. This is the part of the pipeline that changed most, and the current state is:</p>
+    <div class="tablewrap">
+    <table>
+      <thead><tr><th>Day</th><th>How the block is found</th><th>Why not something simpler</th></tr></thead>
+      <tbody>
+        <tr><td>Aug 23</td><td>The corner marks you drew on the holder, plus series-median outlier repair</td>
+          <td>Colour segmentation is unstable here; and a quad that disagrees with its own series' median size is a detection failure, since the block cannot change size between shots</td></tr>
+        <tr><td>Aug 26</td><td>The four red corner dots on the holder</td>
+          <td>The magnet's warm reflections and the orange sticker both overlap the gel's colour range, so colour alone fails</td></tr>
+        <tr><td>Aug 27</td><td>Geometry detected once per series from its t=0 frame, then every later frame registered onto it by ECC</td>
+          <td>Back injection gives a rigid white rim to anchor on; registering absorbs per-frame detection noise instead of propagating it</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p>The four corners are then mapped onto a square by a <b>perspective</b> transform &mdash; not a
+    rotation or a bounding box. This matters: when the phone is tilted, the square block photographs
+    as a trapezoid, and correcting it with a rotated rectangle shears the image so that the injection
+    gap comes out leaning. You caught exactly that on the COOH L3 validation frames, which is why the
+    true four-corner transform is used everywhere now.</p>
+    <div class="params">
+      <div class="k">warp size</div><div>480 &times; 480 px, representing the 10 &times; 10 mm block face</div>
+      <div class="k">margin trimmed</div><div>38 px per side (&asymp; 0.8 mm), because the gel pulls away from the holder late in a run and the seam shadow would otherwise read as nanoparticles</div>
+      <div class="k">measured extent</div><div>0.79 mm to 9.21 mm across the block</div>
+    </div>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="n">STAGE 5</div>
+  <div class="body">
+    <h2>Turning pixels into a nanoparticle signal</h2>
+    <p class="io"><b>In:</b> warped 480 &times; 480 image &nbsp;·&nbsp; <b>Out:</b> a grid of &ldquo;excess darkness&rdquo; values</p>
+    <p>Magnetite nanoparticles are dark brown; agarose is pale. Where particles accumulate, the gel
+    gets darker. The measurement is that darkening, in four steps:</p>
+    <ol>
+      <li><b>Convert to LAB and keep L*</b>, the lightness channel. LAB separates lightness from
+      colour, so the measure responds to how dark a region is rather than to its hue. Darkness is
+      defined as <code>255 &minus; L*</code>.</li>
+      <li><b>Median-bin in 11 &times; 11 pixel blocks.</b> The median, not the mean, so that a
+      speck of dust, a bubble or a specular highlight cannot pull a cell.</li>
+      <li><b>Subtract this frame's own gel floor</b> &mdash; the 15th percentile of the block's
+      interior. This is the step that makes photos comparable at all (see below).</li>
+      <li><b>Light Gaussian smoothing</b> (&sigma; = 1 bin) so the heatmaps read as fields rather
+      than as mosaics.</li>
+    </ol>
+    <div class="callout">
+      <h4>Why the floor subtraction is the important step</h4>
+      <p>A phone camera sets its own exposure for every shot. Across this dataset the absolute
+      lightness of an identical gel varies by roughly &plusmn;30 L* purely from auto-exposure. Any
+      measurement of raw darkness would be dominated by that, not by nanoparticles.</p>
+      <p>Subtracting each frame's <em>own</em> 15th-percentile interior value removes it. The
+      quantity being reported is therefore always <b>darkness above the clean gel in the same
+      photograph</b> &mdash; never darkness compared to some other photograph. It is a within-frame
+      measurement, which is what makes a phone camera usable as an instrument here.</p>
+    </div>
+    <p>The 15th percentile is used rather than the minimum because the minimum is a single pixel and
+    therefore noise; the 15th percentile is the darkness of clean gel in a frame where at most most
+    of the field is affected. It is a robust estimate of &ldquo;background&rdquo;.</p>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="n">STAGE 6</div>
+  <div class="body">
+    <h2>The heatmaps</h2>
+    <p class="io"><b>In:</b> excess-darkness grid per photo &nbsp;·&nbsp; <b>Out:</b> the panels in your report</p>
+    <p>Each heatmap cell is the mean of the three repeats of that condition at that timepoint. The
+    x-axis is millimetres across the block, with <span class="mono">x&nbsp;=&nbsp;0</span> at the
+    block's left edge &mdash; where a back-injection gap would sit &mdash; so that centre-injection
+    days put the gap near 5 mm and all three days share one spatial convention.</p>
+    <p><b>All three days use one colour scale, 0 to 55 L*.</b> This is deliberate and worth being
+    able to defend: an earlier version auto-scaled each panel to its own range, which made the Aug 26
+    panels look dimmer than Aug 23 even though Aug 26 has the strongest signal of the three days. You
+    noticed. Auto-scaling makes panels prettier and makes them lie about relative magnitude, so it
+    was removed.</p>
+    <div class="callout caution">
+      <h4>The one heatmap artefact to declare</h4>
+      <p>BSA gel is intrinsically cloudier than non-BSA gel &mdash; raw darkness around 127 against
+      67. On the shared scale, BSA controls therefore look nearly as bright as BSA magnet arms. That
+      is turbidity, not transport. For BSA conditions the heatmap is qualitative and the asymmetry
+      metric below is the quantity to trust, because cloudiness affects both halves of the block
+      equally and cancels in a difference.</p>
+    </div>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="n">STAGE 7</div>
+  <div class="body">
+    <h2>The asymmetry metric</h2>
+    <p class="io"><b>In:</b> excess-darkness grid &nbsp;·&nbsp; <b>Out:</b> one number per photo, in L*</p>
+    <p>This is the number the line graph plots and the statistics test. Definition:</p>
+    <div class="params">
+      <div class="k">gap position</div><div>the brightest column band in the middle 40% of the block &mdash; the reservoir is the brightest feature there</div>
+      <div class="k">exclusion</div><div>&plusmn;1.0 mm around the gap belongs to neither side, so the reservoir itself cannot drive the result</div>
+      <div class="k">asymmetry</div><div>mean excess darkness of everything to the magnet side, minus mean excess darkness of everything to the far side</div>
+    </div>
+    <p>The reason for a <em>difference</em> rather than a raw amount is that it cancels everything
+    symmetric. Gel cloudiness, residual exposure differences, BSA turbidity, uneven lighting across
+    the whole block &mdash; all of these darken both halves and subtract out. What cannot cancel is
+    material that has actually moved to one side. The magnet is on one side, so directional movement
+    is the signal and everything else is common-mode rejection.</p>
+    <p>This also gives the metric a built-in null test. A no-magnet control has no reason to be
+    asymmetric, so its curve should sit at zero &mdash; and that is a check that runs on every single
+    plot, rather than a calibration done once.</p>
+    <div class="callout">
+      <h4>What the controls actually did</h4>
+      <p>All four non-BSA controls across both days stayed within <b>&plusmn;4.4 L*</b> of zero for
+      the full six hours, with no trend. The magnet arms reach 13 to 42 L*. The separation between
+      signal and null is roughly a factor of five, which is why the existence of transport is not in
+      question even though the comparisons between conditions are.</p>
+    </div>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="n">STAGE 8</div>
+  <div class="body">
+    <h2>From a curve to one number per sample</h2>
+    <p class="io"><b>In:</b> 13 timepoints per series &nbsp;·&nbsp; <b>Out:</b> one plateau value per series</p>
+    <p>Every curve rises and then flattens by about three hours. The summary value for a series is
+    the <b>mean of its 5 h and 6 h points</b> &mdash; its plateau height.</p>
+    <p>Averaging two timepoints rather than taking the single 6 h value halves the effect of one
+    noisy final photograph. The plateau was chosen rather than a rate because the curves are visibly
+    flat by then, so the value is stable; an early-slope measure was also computed and gives the same
+    ordering with larger scatter.</p>
+    <p>This collapses 13 photographs into one number precisely so that the statistics treat the
+    <em>sample</em> as the unit of replication, not the photograph.</p>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="n">STAGE 9</div>
+  <div class="body">
+    <h2>The statistics behind p = 0.045</h2>
+    <p class="io"><b>In:</b> 12 plateau values &nbsp;·&nbsp; <b>Out:</b> a two-way ANOVA</p>
+    <p>Here is the entire dataset that the headline number rests on. Twelve numbers, one per sample.
+    Non-BSA, large magnet, so that the only differences between cells are agarose concentration and
+    coating.</p>
+    <div class="tablewrap">
+    <table>
+      <caption>Plateau asymmetry, mean of 5&ndash;6 h, in L*. Three repeats per cell.</caption>
+      <thead><tr><th>Cell</th><th>Repeat values</th><th class="num">Mean</th></tr></thead>
+      <tbody>
+        <tr><td>0.4% &middot; COOH</td><td class="mono">46.0, 41.8, 36.4</td><td class="num">41.4</td></tr>
+        <tr><td>0.4% &middot; PEG</td><td class="mono">35.1, 45.0, 24.9</td><td class="num">35.0</td></tr>
+        <tr><td>0.6% &middot; COOH</td><td class="mono">12.8, 48.1, 36.2</td><td class="num">32.4</td></tr>
+        <tr><td>0.6% &middot; PEG</td><td class="mono">18.9, 14.5, 9.9</td><td class="num">14.4</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p>Because there are two factors crossed with each other, this is a <b>2 &times; 2 factorial</b>
+    and is tested as one model rather than as separate comparisons. A two-way ANOVA asks three
+    questions of these twelve numbers at once: does concentration matter, does coating matter, and
+    does the effect of one depend on the other.</p>
+    <div class="tablewrap">
+    <table>
+      <caption>Two-way ANOVA. F is the ratio of variation explained by a factor to unexplained
+      variation; p is the probability of seeing a ratio at least that large if the factor did
+      nothing.</caption>
+      <thead><tr><th>Term</th><th class="num">Effect</th><th class="num">F</th><th class="num">p</th></tr></thead>
+      <tbody>
+        <tr><td>Agarose 0.4% vs 0.6%</td><td class="num">+14.8 L*</td><td class="num dim">5.64</td><td class="num sig">0.045</td></tr>
+        <tr><td>Coating COOH vs PEG</td><td class="num">+12.2 L*</td><td class="num dim">3.82</td><td class="num warn">0.086</td></tr>
+        <tr><td>Coating &times; agarose interaction</td><td class="num">&mdash;</td><td class="num dim">0.85</td><td class="num">0.384</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <h3>Why this differs from what I told you earlier</h3>
+    <p>Earlier in this analysis the same data was tested with separate pairwise t-tests, one contrast
+    at a time, and nothing reached significance. That was a defect of the test, not a property of the
+    data. Each pairwise test estimated noise from only the two or three samples in the pair,
+    leaving two to four degrees of freedom; the factorial model estimates noise from all twelve
+    samples at once and has eight. Same numbers, more of them used to measure the noise, so a real
+    effect of this size becomes detectable.</p>
+    <div class="callout caution">
+      <h4>What p = 0.045 does and does not mean</h4>
+      <p>It means: if agarose concentration made no difference whatsoever, data this lopsided would
+      turn up about 4.5% of the time by chance. It is weak-to-moderate evidence, sitting just inside
+      the conventional threshold. It is not a strong result and should not be described as one.</p>
+      <p>It also says nothing about <em>why</em>. In this comparison 0.4% is Aug 23 and 0.6% is
+      Aug 26, so &ldquo;concentration&rdquo; and &ldquo;run day&rdquo; are the same variable. The
+      statistics establish that the two groups differ; they cannot establish that the gel is the
+      reason. That limitation is not fixable by any analysis &mdash; only by running both
+      concentrations on one day.</p>
+    </div>
+    <h3>The 0.6% coating comparison</h3>
+    <p>Within Aug 26 alone &mdash; one day, no cross-day confound &mdash; COOH leads PEG by
+    <b>+12.0 L*</b>, <span class="mono">F = 4.44, p = 0.064</span>, 95% confidence interval
+    <span class="mono">[&minus;0.9, +24.9]</span>, with BSA state included as a blocking factor. The
+    BSA block is itself inert (<span class="mono">p = 0.69</span>), which is what justifies pooling
+    the BSA and non-BSA arms into one test of coating.</p>
+    <p>The confidence interval crosses zero, which is the same statement as p &gt; 0.05. The honest
+    summary is a consistent direction with an effect size that could plausibly be anywhere from
+    nothing to very large.</p>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="n">CHECKS</div>
+  <div class="body">
+    <h2>How we know the pipeline isn't inventing this</h2>
+    <p>Four independent checks, none of which depend on the result coming out a particular way.</p>
+    <h3>1 &middot; Re-encode reproducibility</h3>
+    <p>Every photo was re-saved as a JPEG &mdash; a perturbation of about 1.2 grey levels out of 255,
+    invisible to the eye &mdash; and the entire analysis re-run. A pipeline that is measuring the
+    sample rather than the compression should return the same answer. Median change in the derived
+    depth measure: <b>0.0015 mm</b>, against effects of 0.1 to 0.16 mm per hour. The measurement is
+    roughly a hundred times more stable than the effects being reported.</p>
+    <h3>2 &middot; Two independent geometries agree</h3>
+    <p>The Aug 23 block was located two completely different ways &mdash; by gel colour, and by the
+    corner marks on the holder. Per-sample migration rates from the two methods correlate at
+    <b>r = 0.971</b>, and the ordering of conditions is identical under both. The result does not
+    depend on how the block was found.</p>
+    <h3>3 &middot; Controls sit at zero</h3>
+    <p>Described above: &plusmn;4.4 L* with no trend, against signals of 13 to 42 L*. Nothing in the
+    pipeline forces this &mdash; controls go through exactly the same code.</p>
+    <h3>4 &middot; A metric reproduces a previously published value</h3>
+    <p>The back-injection depth measure, written independently for this comparison, recovers the
+    Aug 27 magnet effect at <b>+0.41 mm</b> against the previously reported <b>+0.44 mm</b>.</p>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="n">LIMITS</div>
+  <div class="body">
+    <h2>Everything wrong with this analysis</h2>
+    <p>Stated plainly, so none of it can be produced as a surprise.</p>
+    <ul>
+      <li><b>Agarose concentration is confounded with run day.</b> 0.4% is Aug 23 and 0.6% is
+      Aug 26. Different gel batch, different session lighting. This is the most serious limitation
+      and no analysis fixes it.</li>
+      <li><b>n = 3.</b> Three samples per cell. One 0.6% COOH repeat plateaus at 12.8 L* and another
+      at 48.1 &mdash; that spread is the reason most contrasts miss significance.</li>
+      <li><b>The coating &times; concentration interaction is not supported</b>
+      (<span class="mono">p = 0.38</span>). The coating gap does look wider at 0.6% (+17.9 vs
+      +6.4 L*), but that specific comparison is the one that fails.</li>
+      <li><b>One cell reverses the coating ordering.</b> Aug 23 small magnet: COOH 7.8, PEG 11.8.
+      It is the cell with the least transport of any, but it exists.</li>
+      <li><b>The back-injection run cannot test any of this.</b> Its own magnet effect is only
+      +0.41 mm at <span class="mono">p = 0.26</span>, so there is nothing there to modulate.</li>
+      <li><b>Darkness is a proxy, not a concentration.</b> No calibration curve relates L* to mg/mL
+      of nanoparticles, and the relationship is certainly not linear at high loading, where the gel
+      saturates towards black. All claims are about more or less, never how much.</li>
+      <li><b>This is a top view of a 3D block.</b> The measurement integrates through the depth of
+      the gel, so it cannot distinguish particles spread through the thickness from particles
+      concentrated at the surface or on the bottom.</li>
+      <li><b>Timepoints are nominal</b>, accurate to the few minutes it took to photograph a round.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2 class="col" style="font-family:Spectral,Georgia,serif;font-size:27px;margin-bottom:6px">If someone challenges you</h2>
+  <p class="col" style="color:var(--ink2);margin-bottom:20px">The questions most likely to come, and
+  the answers the data actually supports.</p>
+  <div class="qa col">
+
+    <details><summary>How do you know darkness means nanoparticles and not something else?</summary>
+    <div class="a"><p>We don't, from the image alone &mdash; which is why the controls matter. A
+    no-magnet control goes through the identical gel, injection, lighting and processing, and stays
+    within &plusmn;4.4 L* of zero asymmetry for six hours. The only systematic difference in the
+    magnet arms is the magnet. Also, the darkening is <strong>directional</strong>: it appears on the
+    magnet side and grows towards it. Cloudiness, drying and lighting drift are not directional, and
+    the asymmetry metric subtracts anything that is symmetric.</p></div></details>
+
+    <details><summary>The camera exposure changed between photos. Doesn't that ruin everything?</summary>
+    <div class="a"><p>It would, and it is the reason for the floor subtraction. Absolute lightness of
+    identical gel varies by about &plusmn;30 L* across this dataset from auto-exposure alone. Every
+    reported value is darkness <strong>relative to clean gel in the same photograph</strong>, taken
+    as that frame's 15th-percentile interior value. Nothing is ever compared across frames in
+    absolute terms.</p></div></details>
+
+    <details><summary>Why is the unit of analysis the sample and not the photograph?</summary>
+    <div class="a"><p>Because thirteen photographs of one sample are thirteen looks at the same
+    thing, not thirteen samples. Treating them as independent would give roughly 156 &ldquo;data
+    points&rdquo; instead of 12 and would shrink every p-value dramatically and falsely. Each series
+    is collapsed to one plateau value first, and the statistics run on those twelve numbers.</p></div></details>
+
+    <details><summary>Why an ANOVA rather than four t-tests?</summary>
+    <div class="a"><p>Because the design is a 2 &times; 2 factorial and the twelve samples all
+    inform the same estimate of noise. Separate pairwise tests each re-estimate noise from two or
+    three samples, leaving two to four degrees of freedom, and throw away most of the available
+    power. The factorial model has eight. This is why the concentration effect appears at
+    <span class="mono">p = 0.045</span> in the correct analysis and appeared non-significant in the
+    earlier pairwise version of the same data.</p></div></details>
+
+    <details><summary>Did you choose the metric after seeing which one gave a good result?</summary>
+    <div class="a"><p>For the centre-injection analysis, no: asymmetry was defined before any
+    statistics were run, and it is the only sensible summary for a symmetric block with a magnet on
+    one side. For the back-injection analysis the metric <em>was</em> changed &mdash; from a
+    mass-weighted centroid to a front position &mdash; and the reason is stated openly: back
+    injection leaves a large reservoir pile at the gap, so a mass-weighted statistic scores a magnet
+    arm that has drawn particles into a long tail <em>lower</em> than a control that kept everything
+    heaped. The change was made on that reasoning, was validated against a previously published value
+    for that run, and did not rescue the result &mdash; the back comparison is still a null.</p></div></details>
+
+    <details><summary>Is 0.4% vs 0.6% really a gel effect, or a day effect?</summary>
+    <div class="a"><p>It cannot be separated. 0.4% is Aug 23 and 0.6% is Aug 26. The statistics
+    establish that the two groups differ; they do not establish the cause. Say so explicitly &mdash;
+    it is a far stronger position than being asked about it. The one comparison that <em>is</em>
+    within a single day is COOH vs PEG at 0.6% (Aug 26), and that one comes out at
+    <span class="mono">p = 0.064</span>.</p></div></details>
+
+    <details><summary>The coating gap looks much bigger at 0.6%. Why can't you claim that?</summary>
+    <div class="a"><p>Because that claim is a statement about a difference between two differences,
+    which is the interaction term, and it tests at <span class="mono">p = 0.38</span>. With three
+    samples per cell there is not enough information to distinguish a genuine interaction from the
+    scatter. Describe the pattern &mdash; &ldquo;COOH led PEG in both concentrations, most markedly
+    at 0.6%&rdquo; &mdash; rather than asserting the concentrations differ in how much coating
+    matters.</p></div></details>
+
+    <details><summary>How do you know the software found the block correctly every time?</summary>
+    <div class="a"><p>Three ways. Validation sheets render the warped block photograph directly
+    above its heatmap for inspection &mdash; that is how the two real geometry failures were found
+    and fixed. The whole analysis was re-run on JPEG-perturbed copies of every photo, changing the
+    result by a median of 0.0015 mm. And on Aug 23 the block was located by two independent methods,
+    gel colour and holder corner marks, whose per-sample rates correlate at r = 0.971 with an
+    identical condition ordering.</p></div></details>
+
+    <details><summary>Why is the injection gap excluded from the measurement?</summary>
+    <div class="a"><p>The gap holds the undelivered reservoir. Including it would mean the biggest
+    number in the image is the material that has not gone anywhere, and small changes in exactly
+    where the gap edge is detected would swamp the transport signal. A band of &plusmn;1.0 mm around
+    the gap is assigned to neither side.</p></div></details>
+
+    <details><summary>Can you say how much material moved?</summary>
+    <div class="a"><p>No. There is no calibration relating L* to nanoparticle concentration, and the
+    relationship saturates at high loading. Every claim is comparative &mdash; more or less, further
+    or shorter &mdash; never a quantity. The same applies to depth: it is a top view integrating
+    through the block thickness, so it cannot separate particles distributed through the depth from
+    particles concentrated at one face.</p></div></details>
+
+    <details><summary>Why does the BSA data look so different in the heatmaps?</summary>
+    <div class="a"><p>BSA gel is intrinsically cloudier &mdash; raw darkness around 127 against 67
+    for non-BSA &mdash; so on the shared colour scale BSA controls look almost as bright as BSA
+    magnet arms. That is turbidity, not transport. It is exactly why the asymmetry metric exists:
+    cloudiness is symmetric and cancels. For BSA conditions, cite the asymmetry numbers and treat the
+    heatmap as illustrative.</p></div></details>
+
+    <details><summary>Was any data excluded?</summary>
+    <div class="a"><p>No sample or timepoint was dropped for its value. The exclusions are all
+    spatial and fixed in advance: a 0.8 mm margin at the block edges where the gel separates from the
+    holder, and &plusmn;1.0 mm around the injection gap. The Aug 26 &ldquo;After injecting&rdquo;
+    folder is not analysed because <span class="mono">t = 0</span> is defined as the magnet going on.
+    One Aug 27 frame failed geometry detection and was repaired from its condition's median rather
+    than discarded.</p></div></details>
+
+  </div>
+</section>
+
+<footer class="col">
+  <p>Pipeline source: <span class="mono">catalog*.py</span> &rarr; <span class="mono">preprocess*.py</span>
+  &rarr; <span class="mono">block23_corners.py</span> / <span class="mono">block23_series.py</span> /
+  <span class="mono">block26.py</span> / <span class="mono">make_block_atlas*.py</span> &rarr;
+  <span class="mono">cross_day_compare.py</span>. Per-series values in
+  <span class="mono">centre_plateau_by_series.csv</span>; per-frame values in
+  <span class="mono">cross_day_asymmetry.csv</span>.</p>
+  <p>Results pages:
+  <a href="https://claude.ai/code/artifact/dc9ab75c-f692-46a1-8b48-0fe06abd2c1c">0.4% vs 0.6% comparison</a>,
+  <a href="https://claude.ai/code/artifact/bfbbd924-d55b-411c-b54a-6c53b0541676">Aug&nbsp;23 heatmaps</a>,
+  <a href="https://claude.ai/code/artifact/13f18308-9059-4fb3-a44f-672c425ffd74">Aug&nbsp;26 heatmaps</a>,
+  <a href="https://claude.ai/code/artifact/b3891b33-43e9-4880-b0cf-80f59790fb3e">Aug&nbsp;27 heatmaps</a>.</p>
+</footer>
+
+</main>
