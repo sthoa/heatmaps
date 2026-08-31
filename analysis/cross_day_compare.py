@@ -133,38 +133,45 @@ def panel_asymmetry(ax, df):
     ax.axhline(0, color="#888", lw=.8, zorder=0)
     ax.set_xlabel("hours after magnet applied", fontsize=10)
     ax.set_ylabel("asymmetry  (magnet side \u2212 far side, L*)", fontsize=10)
-    ax.set_title("Every magnet arm clears the control envelope; the ordering by gel "
-                 "stiffness is consistent but not\nsignificant at n=3 \u2014 only "
-                 "PEG 0.4% vs 0.6% comes close (p=0.054)",
+    ax.set_title("Centre injection, Aug 23 vs Aug 26 \u2014 softer gel transports further in both "
+                 "coatings,\nconsistently but not significantly at n=3 (best contrast p=0.054)",
                  fontsize=11, pad=9, loc="left")
     ax.legend(fontsize=8.6, frameon=False, loc="upper left")
     ax.set_xlim(-0.15, 6.15); ax.grid(alpha=.16, lw=.6)
 
 
-def panel_aug27(ax, path):
+def panel_back(ax, path):
+    """0.4% vs 0.6% in the back-injection run, within one day.
+
+    Front position (deepest point still at 20% of peak darkness) of each magnet
+    series minus the mean of its own cell's controls, so the comparison is
+    paired within (BSA, coating). Bands are +/- 1 SEM across 12 series.
+    """
     b = pd.read_csv(path)
-    key = ["agarose", "bsa", "coating", "t"]
-    piv = b.pivot_table(index=key, columns="arm", values="depth_mm").dropna().reset_index()
-    piv["delta"] = piv.magnet - piv.control
-    w = piv.pivot_table(index="t", columns=["agarose", "bsa", "coating"], values="delta")
-    for c in w.columns:
-        ax.plot(w.index, w[c], color="#9aa0a6", lw=.9, alpha=.75)
-    ax.plot(w.index, w.mean(axis=1), color="#5B3E96", lw=2.3, marker="o", ms=3.6,
-            label=f"mean of {w.shape[1]} conditions")
-    ax.axhline(0, color="#888", lw=.8)
+    mag = b[b.arm == "magnet"].dropna(subset=["front_net"])
+    for ag, g in mag.groupby("agarose"):
+        key = f"{ag:.1f}%".replace(".0%", "%") if isinstance(ag, float) else f"{ag}%"
+        col = C[("0.4%", "COOH")] if float(ag) < 0.5 else C[("0.6%", "COOH")]
+        p = g.pivot_table(index="t", columns="series", values="front_net")
+        mu, se = p.mean(axis=1), p.std(axis=1) / np.sqrt(p.notna().sum(axis=1))
+        ax.fill_between(p.index, mu - se, mu + se, color=col, alpha=.15, lw=0)
+        ax.plot(p.index, mu, color=col, lw=2.2, marker="o", ms=3.6,
+                label=f"{float(ag)*100:.0f}".rstrip() and f"{ag}% agarose  (n={p.shape[1]} series)")
+    ax.axhline(0, color="#888", lw=.9)
     ax.set_xlabel("hours after magnet applied", fontsize=10)
-    ax.set_ylabel("magnet − control\npenetration depth (mm)", fontsize=10)
-    ax.set_title("Aug 27 · back injection · a different quantity, shown for context only",
-                 fontsize=11.5, pad=9, loc="left")
+    ax.set_ylabel("front position, magnet \u2212 control (mm)", fontsize=10)
+    ax.set_title("Back injection, Aug 27, within one day \u2014 no stiffness difference, and barely\n"
+                 "any magnet effect to modulate (+0.41 mm overall, p=0.26)",
+                 fontsize=11, pad=9, loc="left")
     ax.legend(fontsize=8.6, frameon=False, loc="lower right")
     ax.grid(alpha=.16, lw=.6)
 
 
 def figure(df, out):
     fig, axes = plt.subplots(2, 1, figsize=(9.6, 9.2),
-                             gridspec_kw=dict(height_ratios=[1.55, 1], hspace=.42))
+                             gridspec_kw=dict(height_ratios=[1.4, 1], hspace=.44))
     panel_asymmetry(axes[0], df)
-    panel_aug27(axes[1], Path(__file__).parent / "band_metrics.csv")
+    panel_back(axes[1], Path(__file__).parent / "back_depth_metrics.csv")
     for ax in axes:
         for s in ("top", "right"):
             ax.spines[s].set_visible(False)
