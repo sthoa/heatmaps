@@ -145,22 +145,27 @@ class SeriesGeom:
         warp = np.eye(2, 3, dtype=np.float32)
         try:
             _, warp = cv2.findTransformECC(
-                self.ref_gm, gradmag(img), warp, cv2.MOTION_AFFINE,
+                self.ref_gm, gradmag(img), warp, cv2.MOTION_TRANSLATION,
                 (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 200, 1e-5), None, 5)
             img = cv2.warpAffine(img, warp, (480, 480), flags=cv2.INTER_LINEAR + cv2.WARP_INVERSE_MAP)
         except cv2.error:
             pass
-        # residual-drift anchor, primary: re-detect the gap (dark run after the
-        # white rim) in THIS frame and shift its position onto t0's. Ground
-        # truth check on r2 showed post-ECC drift up to +31 px (+1.15 mm).
-        gl, wdt = detect_gap_run(img, self.Y0, self.Y1)
+        # residual-drift anchor, primary: the rim's INNER EDGE (the print,
+        # physically fixed and visible in every frame) — steepest white->dark
+        # fall in a wide window. Gap-run and profile correlation are backups
+        # (the gap run merges with the NP mass from ~3 h in fast series).
+        wf0 = whitefrac_cols(img, self.Y0, self.Y1)
+        lo0, hi0 = max(1, self.rimedge0 - 40), min(258, self.rimedge0 + 41)
+        dwf0 = np.diff(wf0[lo0:hi0])
         shift = None
-        if gl is not None and 8 <= wdt <= 45 and 40 <= gl <= 200:
-            shift = int(np.clip(self.GL0 - gl, -45, 45))
-        else:
-            # backup: whiteness-profile correlation over a wide range;
-            # reject only if saturated at the range limit
-            p = whitefrac_cols(img, self.Y0, self.Y1)[:240]
+        if len(dwf0) and dwf0.min() < -0.04:
+            shift = int(np.clip(self.rimedge0 - (lo0 + int(np.argmin(dwf0))), -40, 40))
+        if shift is None:
+            gl, wdt = detect_gap_run(img, self.Y0, self.Y1)
+            if gl is not None and 8 <= wdt <= 45 and 40 <= gl <= 200:
+                shift = int(np.clip(self.GL0 - gl, -45, 45))
+        if shift is None:
+            p = wf0[:240]
             p = p - p.mean()
             best_s, best_c = 0, -1e9
             for s in range(-45, 46):
