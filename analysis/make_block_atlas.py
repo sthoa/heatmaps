@@ -239,6 +239,68 @@ def draw_boundary(ax):
     ax.axvline(0, color="white", lw=1.2, ls=(0, (3, 3)))
 
 
+def condition_geometry(cg, pick, load):
+    """Per-series geometry for one condition (t0 reference, sibling-median
+    repair). Returns (geoms, ext) exactly as the atlas uses them."""
+    # per-series geometry: t0 reference; if its geometry fails, try the 1h
+    # frame as reference+geometry; sibling-median repair as last resort
+    geoms = {}
+    for (arm, rep), g in cg.groupby(["arm", "tally_f"]):
+        chosen = None
+        for tref, need_mag in [(0.0, arm == "magnet"), (1.0, False)]:
+            i0 = pick(g, tref, magnet_needed=need_mag)
+            if i0 is None:
+                continue
+            geo = SeriesGeom(load(i0))
+            if geo.ok:
+                chosen = geo
+                break
+            if chosen is None:
+                chosen = geo
+        if chosen is not None:
+            geoms[(arm, rep)] = chosen
+    good = [x for x in geoms.values() if x.ok]
+    if good:
+        med = lambda a: int(np.median(a))
+        gGL0 = med([x.GL0 for x in good]); gX1 = med([x.X1 for x in good])
+        gY0 = med([x.Y0 for x in good]); gY1 = med([x.Y1 for x in good])
+        gGB = med([x.GB for x in good])
+        for x in geoms.values():
+            repair = not x.ok
+            # per-edge outlier repair even when the gap was detected
+            if abs(x.X1 - gX1) > 25: x.X1 = gX1; repair = True
+            if abs(x.Y0 - gY0) > 25: x.Y0 = gY0; repair = True
+            if abs(x.Y1 - gY1) > 25: x.Y1 = gY1; repair = True
+            if not x.ok:
+                x.GL0, x.GB = gGL0, gGB
+            if repair:
+                x.mm_per_px = 10.0 / ((x.X1 - x.GL0) - x.GB)
+                x.left_mm = -x.GB * x.mm_per_px
+    exts = [geoms[k].left_mm for k in geoms]
+    left_mm = float(np.median(exts))
+    ext = [left_mm, 10, 10, 0]
+    return geoms, ext
+
+
+def condition_maps(cg, geoms, pick, load, stages=None):
+    """Mean processed field per (arm, stage) for one condition -> {(arm, t): (D|None, n)}.
+    Shared by the atlas and by any composite figure that wants the same maps."""
+    out = {}
+    for arm in ["magnet", "control"]:
+        for t in (stages or STAGES):
+            maps = []
+            for rep in [1, 2, 3]:
+                if (arm, rep) not in geoms:
+                    continue
+                g = cg[(cg.arm == arm) & (cg.tally_f == rep)]
+                it = pick(g, t)
+                if it is None:
+                    continue
+                maps.append(process_abs(geoms[(arm, rep)].aligned_field(load(it))))
+            out[(arm, t)] = (np.mean(maps, axis=0) if maps else None, len(maps))
+    return out
+
+
 def main():
     m = pd.read_csv("photos_final.csv", dtype={"agarose_f": str})
     wr = pd.read_csv("warp_report.csv")
@@ -256,43 +318,7 @@ def main():
     load = lambda i: cv2.imread(str(S / "prep" / "warped" / f"{i:04d}.jpg"))
 
     for (ag, bsa, co), cg in m.groupby(["agarose_f", "bsa_f", "coating_f"]):
-        # per-series geometry: t0 reference; if its geometry fails, try the 1h
-        # frame as reference+geometry; sibling-median repair as last resort
-        geoms = {}
-        for (arm, rep), g in cg.groupby(["arm", "tally_f"]):
-            chosen = None
-            for tref, need_mag in [(0.0, arm == "magnet"), (1.0, False)]:
-                i0 = pick(g, tref, magnet_needed=need_mag)
-                if i0 is None:
-                    continue
-                geo = SeriesGeom(load(i0))
-                if geo.ok:
-                    chosen = geo
-                    break
-                if chosen is None:
-                    chosen = geo
-            if chosen is not None:
-                geoms[(arm, rep)] = chosen
-        good = [x for x in geoms.values() if x.ok]
-        if good:
-            med = lambda a: int(np.median(a))
-            gGL0 = med([x.GL0 for x in good]); gX1 = med([x.X1 for x in good])
-            gY0 = med([x.Y0 for x in good]); gY1 = med([x.Y1 for x in good])
-            gGB = med([x.GB for x in good])
-            for x in geoms.values():
-                repair = not x.ok
-                # per-edge outlier repair even when the gap was detected
-                if abs(x.X1 - gX1) > 25: x.X1 = gX1; repair = True
-                if abs(x.Y0 - gY0) > 25: x.Y0 = gY0; repair = True
-                if abs(x.Y1 - gY1) > 25: x.Y1 = gY1; repair = True
-                if not x.ok:
-                    x.GL0, x.GB = gGL0, gGB
-                if repair:
-                    x.mm_per_px = 10.0 / ((x.X1 - x.GL0) - x.GB)
-                    x.left_mm = -x.GB * x.mm_per_px
-        exts = [geoms[k].left_mm for k in geoms]
-        left_mm = float(np.median(exts))
-        ext = [left_mm, 10, 10, 0]
+        geoms, ext = condition_geometry(cg, pick, load)
 
         fig, axes = plt.subplots(2, len(STAGES), figsize=(len(STAGES) * 1.95, 2 * 1.9))
         for ri, arm in enumerate(["magnet", "control"]):

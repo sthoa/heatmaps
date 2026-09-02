@@ -238,11 +238,11 @@ def repaired_quads():
             for _, r in g.iterrows()}
 
 
-def main():
+def main(title=True, outdir=None, dpi=118, scale=1.0):
     m = pd.read_csv(Path(__file__).parent / "photos23_final.csv", parse_dates=["capture_time"])
     QUADS = repaired_quads()
     m["date"] = m.capture_time.dt.date
-    outdir = S / "panels"
+    outdir = Path(outdir) if outdir else S / "panels"
     outdir.mkdir(exist_ok=True)
     load = lambda i: cv2.imread(str(S / "frames" / f"{int(i):04d}.jpg"))
 
@@ -255,7 +255,7 @@ def main():
     ARMS = [("large", "large magnet\n(mean L1-L3)"), ("small", "small magnet\n(mean S1-S3)"),
             ("control", "control\n(no magnet)")]
     for coating, cg in m.groupby("coating"):
-        fig, axes = plt.subplots(3, len(STAGES), figsize=(len(STAGES) * 1.75, 3 * 1.85))
+        fig, axes = plt.subplots(3, len(STAGES), figsize=tuple(scale * v for v in (len(STAGES) * 1.75, 3 * 1.85)))
         for ri, (arm, label) in enumerate(ARMS):
             ag = cg[cg.arm == arm]
             for ci, t in enumerate(STAGES):
@@ -297,14 +297,14 @@ def main():
                     ax.set_title(f"{t:g} h", fontsize=10)
                 if ci == 0:
                     ax.set_ylabel(label, fontsize=8.5, rotation=0, ha="right", va="center", labelpad=8)
-        fig.suptitle(f"23 Aug · 0.4% agarose · non-BSA · {coating} · centre injection", fontsize=11.5, y=0.99)
-        plt.tight_layout(rect=[0.02, 0.10, 1, 0.94])
+        if title: fig.suptitle(f"23 Aug · 0.4% agarose · non-BSA · {coating} · centre injection", fontsize=11.5, y=0.99)
+        plt.tight_layout(rect=[0.02, 0.10, 1, 0.94 if title else 0.99])
         cax = fig.add_axes([0.34, 0.055, 0.32, 0.016])
         sm = plt.cm.ScalarMappable(cmap="inferno", norm=plt.Normalize(0, VMAX))
         cb = fig.colorbar(sm, cax=cax, orientation="horizontal")
         cb.set_ticks([0, 25, 55]); cb.ax.tick_params(labelsize=6, pad=1)
         cb.set_label("NP darkness above gel floor (L*)", fontsize=7, labelpad=2)
-        plt.savefig(outdir / f"{coating}.png", dpi=118)
+        plt.savefig(outdir / f"{coating}.png", dpi=dpi)
         plt.close(fig)
         print("done", coating, flush=True)
 

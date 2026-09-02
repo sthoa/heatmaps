@@ -56,9 +56,9 @@ def process_abs(Db):
     return gaussian_filter(np.clip(Db - floor, 0, None), 1.0)
 
 
-def main():
+def main(title=True, outdir=None, dpi=118, scale=1.0):
     m = pd.read_csv(Path(__file__).parent / "photos26_final.csv", parse_dates=["capture_time"])
-    outdir = S / "panels"
+    outdir = Path(outdir) if outdir else S / "panels"
     outdir.mkdir(exist_ok=True)
     load = lambda i: cv2.imread(str(S / "frames" / f"{int(i):04d}.jpg"))
 
@@ -75,7 +75,7 @@ def main():
         vmax = VMAX
         rows = [("PEG", False, "PEG + magnet\n(mean r1-r3)"), ("PEG", True, "PEG control\n(no magnet)"),
                 ("COOH", False, "COOH + magnet\n(mean r1-r3)"), ("COOH", True, "COOH control\n(no magnet)")]
-        fig, axes = plt.subplots(len(rows), len(STAGES), figsize=(len(STAGES) * 1.72, len(rows) * 1.72))
+        fig, axes = plt.subplots(len(rows), len(STAGES), figsize=tuple(scale * v for v in (len(STAGES) * 1.72, len(rows) * 1.72)))
         for ri, (coat, is_ctrl, label) in enumerate(rows):
             sel = bg[(bg.coating == coat) & (bg.control == is_ctrl)]
             for ci, t in enumerate(STAGES):
@@ -116,15 +116,15 @@ def main():
                     ax.set_title(f"{t:g} h", fontsize=10)
                 if ci == 0:
                     ax.set_ylabel(label, fontsize=8, rotation=0, ha="right", va="center", labelpad=8)
-        fig.suptitle(f"26 Aug · 0.6% agarose · {bsa} · centre injection · large magnet",
+        if title: fig.suptitle(f"26 Aug · 0.6% agarose · {bsa} · centre injection · large magnet",
                      fontsize=11.5, y=0.99)
-        plt.tight_layout(rect=[0.02, 0.07, 1, 0.95])
+        plt.tight_layout(rect=[0.02, 0.07, 1, 0.95 if title else 0.99])
         cax = fig.add_axes([0.34, 0.045, 0.32, 0.014])
         sm = plt.cm.ScalarMappable(cmap="inferno", norm=plt.Normalize(0, vmax))
         cb = fig.colorbar(sm, cax=cax, orientation="horizontal")
         cb.set_ticks([0, round(vmax/2), round(vmax)]); cb.ax.tick_params(labelsize=6, pad=1)
         cb.set_label("NP darkness above this block's gel floor (L*) — same scale as the other run days", fontsize=6.5, labelpad=2)
-        plt.savefig(outdir / f"{bsa}.png", dpi=118)
+        plt.savefig(outdir / f"{bsa}.png", dpi=dpi)
         plt.close(fig)
         print("done", bsa, flush=True)
 
