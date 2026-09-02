@@ -293,7 +293,8 @@ def condition_maps(cg, geoms, pick, load, stages=None):
                 if (arm, rep) not in geoms:
                     continue
                 g = cg[(cg.arm == arm) & (cg.tally_f == rep)]
-                it = pick(g, t)
+                # at t=0 a magnet block has a pre- and a post-magnet photo; use the latter
+                it = pick(g, t, arm == "magnet" and t == 0.0)
                 if it is None:
                     continue
                 maps.append(process_abs(geoms[(arm, rep)].aligned_field(load(it))))
