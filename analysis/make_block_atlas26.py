@@ -69,7 +69,7 @@ def main():
     for bsa, bg in m.groupby("bsa"):
         # One shared 0-VMAX scale across BSA, non-BSA and the other experiment
         # days, so panels are directly comparable. BSA gel is intrinsically
-        # cloudier (raw darkness ~127 vs ~67 for non-BSA), so its controls
+        # cloudier (median raw darkness ~129 vs ~106 for non-BSA), so its controls
         # saturate at this ceiling - that is the cloudiness, not transport, and
         # the asymmetry metric is the readout to trust for BSA.
         vmax = VMAX

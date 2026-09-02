@@ -1,62 +1,78 @@
-# Nanoparticles
+# heatmaps
 
-Magnetic nanoparticle transport experiments in agarose, with an automated image-analysis pipeline.
+Automated image analysis of magnetic nanoparticle transport through agarose, from top-view phone photographs. Three run days, ~1000 photos, one pipeline per injection geometry.
 
 ## Experiment
 
-70 µL of magnetic nanoparticles are injected into a 1×10×10 mm gap beside a 10×10×10 mm agarose block held in a 3D-printed case. A magnet on the opposite face pulls the NPs through the block; top-view phone photos are taken at intervals. Conditions compared: PEG vs COOH coating, BSA vs non-BSA agarose, 0.4 % vs 0.6 % agarose, magnet vs no-magnet controls (3 repeats each).
+70 µL of magnetic nanoparticles are injected into a 1 × 10 × 10 mm gap beside a 10 × 10 × 10 mm agarose block in a 3D-printed holder. A magnet on one face pulls the particles through the block; top-view phone photos are taken at intervals. Conditions varied across days: PEG vs COOH coating, BSA vs non-BSA agarose, 0.4 % vs 0.6 % agarose, large vs small magnet, centre vs back injection, and no-magnet controls.
 
-`27th August (…)/` holds the raw photos for the 21.5 h back-injection run: 600 photos across 8 conditions × (3 magnet + 3 control repeats) × 12 timepoints, sorted by agarose %, BSA, and nominal timepoint. Capture times are embedded in the `PXL_*` filenames; each sample's condition is on the sticker in frame, repeats are tally marks, controls are marked "C".
+| Day | Design | Photos | Series |
+|---|---|---|---|
+| Aug 23 | 0.4 %, non-BSA, **centre** injection, large vs small magnet, 6 h | 196 | 14 |
+| Aug 26 | 0.6 %, BSA vs non-BSA, **centre** injection, large magnet, 6 h | 209 | 16 |
+| Aug 27 | 0.4 & 0.6 %, BSA vs non-BSA, **back** injection, 21.5 h | 600 | 48 |
+
+A *series* is one physical sample followed through time. It is the unit of replication in every statistical test.
+
+## Published pages
+
+| Page | What it is |
+|---|---|
+| [How the numbers were made](https://claude.ai/code/artifact/f6367f9b-094b-4a9a-a687-19a2aef996bf) | **Start here.** Every stage from photo to p-value, the checks, the limitations, and a Q&A |
+| [0.4 % vs 0.6 % agarose](https://claude.ai/code/artifact/dc9ab75c-f692-46a1-8b48-0fe06abd2c1c) | The gel-stiffness comparison in both geometries, with statistics |
+| [Aug 23 heatmaps](https://claude.ai/code/artifact/bfbbd924-d55b-411c-b54a-6c53b0541676) | Centre injection, large vs small magnet |
+| [Aug 26 heatmaps](https://claude.ai/code/artifact/13f18308-9059-4fb3-a44f-672c425ffd74) | Centre injection, BSA vs non-BSA |
+| [Aug 27 heatmaps](https://claude.ai/code/artifact/b3891b33-43e9-4880-b0cf-80f59790fb3e) | Back injection, all eight conditions |
+
+The same pages are committed as HTML and PDF under `analysis/outputs/`.
 
 ## Pipeline (`analysis/`)
 
-Python (uv venv, opencv/numpy/pandas/scipy/matplotlib). Main stages, in order:
+Python 3.12 in a uv venv: opencv, numpy, pandas, scipy, matplotlib, statsmodels.
 
-| Script | What it does |
-|---|---|
-| `catalog.py` | walk the photo tree, parse capture times → `photos.csv` |
-| `preprocess.py` | downscaled frames + high-res crops of the red tally marks |
-| `detect_wells.py` | find the agarose well in every frame (HSV masks + fallbacks) |
-| `warp_all.py` | two-pass perspective warp to a canonical square, magnet side right |
-| `merge_classifications.py`, `reconcile.py` | merge vision-read labels (sticker / tally / control / magnet), dedupe cross-filed photos, resolve repeats → `photos_final.csv` |
-| `measure.py`, `analyze.py`, `analyze2.py` | intensity profiles, band-depth metrics, per-series kymographs |
-| `make_block_atlas.py` | **final block-heatmap atlas** — the validated recipe (see below) |
-| `make_sheet.py` | verification contact sheet for auditing the automated sorting |
+```
+catalog*.py            photo tree → photos*.csv (timepoint from folder name, capture time from PXL_ filename)
+preprocess*.py         downscale to 1100 px long edge; sticker / tally crops
+reconcile*.py          merge vision-read labels, referee tally trios, key everything by file path → photos*_final.csv
+block23_corners.py     Aug 23 block corners from the holder's corner marks
+block23_series.py      Aug 23 series-median outlier repair → geom23_series.csv
+block26.py             Aug 26 block corners from the red corner dots
+detect_wells.py,       Aug 27 well detection and two-pass perspective warp
+  warp_all.py
+make_block_atlas*.py   perspective-warp to 480 px square, LAB darkness, per-frame floor, heatmap panels
+cross_day_compare.py   asymmetry metric for both centre-injection days → cross_day_asymmetry.csv,
+                       centre_plateau_by_series.csv, and the comparison figure
+back_depth_compare.py  front-position metric for the back-injection day → back_depth_metrics.csv
+centre_stats.py        the 2 × 2 ANOVA and every p-value on the pages
+build_cross_day_page.py  renders outputs/cross_day_comparison.html
+```
 
-### The validated heatmap recipe (`make_block_atlas.py`)
+Geometry is found differently on each day because each rig offers different reliable features; the measurement that follows is identical: darkness = 255 − L\* in LAB, median-binned, minus the frame's own 15th-percentile gel floor, on a shared 0–55 L\* colour scale.
 
-Validated frame-by-frame against the photos (see `analysis/outputs/r2_validation.html`):
+`analysis/legacy/` holds metric tables from early interactive sessions with no producer script. Do not cite numbers from them.
 
-1. ECC affine registration of each frame onto its series' t = 0 (Sobel-gradient images).
-2. Coarse anchor: re-detect the injection gap (the dark run after the white rim) in every frame and shift it onto its t = 0 position; fine anchor: align the rim's inner edge (the print itself, which cannot move).
-3. One crop per series from t = 0; per-edge sibling-median repair for outliers.
-4. The gap/block boundary is measured once from the t = 0 reservoir band and held fixed (agarose shrinkage over the run is shown, not compensated); mm scale: boundary → block far face = 10 mm.
-5. Display: absolute NP darkness minus each frame's own gel-interior floor (cancels the phone's auto-exposure), median-binned, lightly smoothed, one shared color scale.
+## Current findings
 
-## Outputs (`analysis/outputs/`)
+**Centre injection (Aug 23 + Aug 26).** Every magnet arm separates cleanly from the no-magnet controls, which stay within ±4.4 L\* of zero asymmetry for six hours. Analysed as the 2 × 2 factorial it is (agarose × coating, non-BSA large-magnet arms, n = 12 series):
 
-- `block_heatmap_atlas.html` — per-condition block heatmaps, magnet vs control (mean of 3 repeats) at five time stages
-- `kymograph_atlas.html` — per-repeat position–time heatmaps
-- `magnet_effect_figures.html` — band-depth comparison figures and methods/limits
-- `verification_sheet.html` — audit sheet for the automated photo sorting
-- `r2_validation.html` — photo-vs-heatmap validation of the atlas recipe
-- `block_heatmap_panels/`, `kymograph_panels/` — the PNG panels
+| Term | Effect | F | p |
+|---|---|---|---|
+| Agarose 0.4 % vs 0.6 % | +14.8 L\* | 5.64 | **0.045** |
+| Coating COOH vs PEG | +12.2 L\* | 3.82 | 0.086 |
+| Coating × agarose | — | 0.85 | 0.384 |
 
-## Key findings (Aug 27 run)
+Softer gel transports further in both coatings. **Caveat: 0.4 % is Aug 23 and 0.6 % is Aug 26, so agarose concentration is confounded with run day.** Within Aug 26 alone, COOH leads PEG by +12.0 L\* (p = 0.064, BSA as block). The apparent wider coating gap at 0.6 % is the interaction term and is not supported.
 
-- Bulk transport through the gel is shallow: the visible NP band reaches ≤ 4 mm of the 10 mm block in every condition. Controls plateau at ~3 mm within the first hour; magnet arms keep advancing all run (+0.44 mm at 21.5 h, 7/8 conditions, paired t = 2.66).
-- NPs do reach the magnet-side wall: on disassembly a deposit sits directly in front of the magnet face (not at the bottom or side seams), i.e. the NPs traveled **through the agarose**. The through-gel flux is too dilute to tint the gel visibly in transit but concentrates into a visible patch at the wall; the top view cannot quantify it because the magnet occludes and shadows that zone.
-- Coating / BSA / agarose % differences are within repeat-level noise at n = 3.
-- Protocol notes for future runs: lock exposure and white balance, mount the camera, keep a gray card in frame, and photograph all blocks magnet-off (top + side) at the end of the run.
+**Back injection (Aug 27).** Both concentrations ran in one session (n = 12 per concentration), but the magnet effect itself is only +0.41 mm (p = 0.26): the particles barely left the first few millimetres in 21.5 h, so there is nothing for gel stiffness to modulate. No difference found (p = 0.61). Nanoparticles do reach the magnet-side wall — a deposit sits directly in front of the magnet face on disassembly — but the top view cannot quantify it.
 
 ## Reproducing
 
 ```bash
 cd analysis
-uv venv --python 3.12 && uv pip install opencv-python-headless numpy pandas matplotlib pillow scipy
-.venv/bin/python catalog.py "../27th August (21.5 Hours, Back 0.6 vs Back 0.4, BSA vs Non-BSA, PEG vs COOH, N=3 Controls) 2"
-# then preprocess.py, detect_wells.py, warp_all.py, merge_classifications.py,
-# reconcile.py, measure.py, analyze.py, make_block_atlas.py
+uv venv --python 3.12
+uv pip install opencv-python-headless numpy pandas scipy matplotlib pillow statsmodels
+.venv/bin/python cross_day_compare.py     # asymmetry curves + figure (needs the downscaled frames)
+.venv/bin/python centre_stats.py          # every p-value, from the committed per-series CSV
 ```
 
-Intermediate images (downscaled frames, warped wells, tally crops) are written to a scratch directory and regenerate from the raw photos; the sticker/tally classifications were produced by vision models with human spot-checks and live in the committed CSVs.
+Downscaled frames and warped wells live in a scratch directory and regenerate from the raw photos via `preprocess*.py`; the label classifications were produced by vision models with referee passes and human spot-checks and live in the committed CSVs.
