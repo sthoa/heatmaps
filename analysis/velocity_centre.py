@@ -51,8 +51,8 @@ import make_block_atlas23 as A23
 import make_block_atlas26 as A26
 from block26 import block_quad as quad26
 
-FRONT_THR = 25.0 / L_SCALE        # L* of change since t=0: the BULK front, about half the plateau level reached at the wall
-LEAD_THR = 15.0 / L_SCALE         # L*: the LEADING front, the faintest level clear of the control blocks' noise
+FRONT_THR = 15.0 / L_SCALE        # L* of change since t=0 (5.9): the lowest level at which every control block still reads zero
+LEAD_THR = 15.0 / L_SCALE         # kept equal to FRONT_THR; retained so older columns keep their names
 EDGE_SKIP = 0.6         # mm beyond the gap edge ignored when locating a front (reservoir-edge drift reaches ~0.5 mm)
 START_WIN = 1.2         # mm: a plume must begin within this distance of the gap edge to count
 BRIDGE = 0.5            # mm: dips below threshold shorter than this do not end the plume
