@@ -353,7 +353,7 @@ def main():
                 if ri == 1:
                     ax.set_xticks([0, 5, 10]); ax.set_xticklabels(["0", "5", "10"], fontsize=7)
                     if ci == 2:
-                        ax.set_xlabel("mm from t=0 gap/block boundary  (magnet side →)", fontsize=8.5)
+                        ax.set_xlabel("Distance from gap/block boundary (mm)", fontsize=8.5)
                 else:
                     ax.set_xticks([])
                 for s in ax.spines.values():
@@ -361,7 +361,7 @@ def main():
                 if ri == 0:
                     ax.set_title(f"{t:g} h", fontsize=10)
                 if ci == 0:
-                    ax.set_ylabel(arm, fontsize=9.5, rotation=0, ha="right", va="center", labelpad=8)
+                    ax.set_ylabel(arm.capitalize(), fontsize=9.5, rotation=0, ha="right", va="center", labelpad=8)
         fig.suptitle(f"{ag}% agarose · {bsa} · {co}   (mean of 3 repeats)", fontsize=11.5, y=0.99)
         plt.tight_layout(rect=[0.015, 0.06, 1, 0.94])
         cax = fig.add_axes([0.32, 0.045, 0.36, 0.02])

@@ -74,8 +74,8 @@ def main(title=True, outdir=None, dpi=118, scale=1.0):
         # saturate at this ceiling - that is the cloudiness, not transport, and
         # the asymmetry metric is the readout to trust for BSA.
         vmax = VMAX
-        rows = [("PEG", False, "PEG + magnet\n(mean r1-r3)"), ("PEG", True, "PEG control\n(no magnet)"),
-                ("COOH", False, "COOH + magnet\n(mean r1-r3)"), ("COOH", True, "COOH control\n(no magnet)")]
+        rows = [("PEG", False, "PEG, magnet\n(mean of r1–r3)"), ("PEG", True, "PEG, control\n(no magnet)"),
+                ("COOH", False, "COOH, magnet\n(mean of r1–r3)"), ("COOH", True, "COOH, control\n(no magnet)")]
         fig, axes = plt.subplots(len(rows), len(STAGES), figsize=tuple(scale * v for v in (len(STAGES) * 1.72, len(rows) * 1.72)))
         for ri, (coat, is_ctrl, label) in enumerate(rows):
             sel = bg[(bg.coating == coat) & (bg.control == is_ctrl)]
@@ -107,7 +107,7 @@ def main(title=True, outdir=None, dpi=118, scale=1.0):
                 if ri == len(rows) - 1:
                     ax.set_xticks([1, 5, 9]); ax.set_xticklabels(["1", "5", "9"], fontsize=7)
                     if ci == len(STAGES) // 2:
-                        ax.set_xlabel("mm across block  (injection gap ~centre, magnet side →)",
+                        ax.set_xlabel("Distance across block (mm)",
                                       fontsize=8.5, labelpad=4)
                 else:
                     ax.set_xticks([])

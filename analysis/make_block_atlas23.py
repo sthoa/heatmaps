@@ -253,8 +253,8 @@ def main(title=True, outdir=None, dpi=118, scale=1.0):
             sub = sub[sub.v_magnet == "present"]
         return int(sub.iloc[0].idx) if len(sub) else None
 
-    ARMS = [("large", "large magnet\n(mean L1-L3)"), ("small", "small magnet\n(mean S1-S3)"),
-            ("control", "control\n(no magnet)")]
+    ARMS = [("large", "Large magnet\n(mean of L1–L3)"), ("small", "Small magnet\n(mean of S1–S3)"),
+            ("control", "Control\n(no magnet)")]
     for coating, cg in m.groupby("coating"):
         fig, axes = plt.subplots(3, len(STAGES), figsize=tuple(scale * v for v in (len(STAGES) * 1.75, 3 * 1.85)))
         for ri, (arm, label) in enumerate(ARMS):
@@ -288,7 +288,7 @@ def main(title=True, outdir=None, dpi=118, scale=1.0):
                 if ri == 2:
                     ax.set_xticks([1, 5, 9]); ax.set_xticklabels(["1", "5", "9"], fontsize=7)
                     if ci == len(STAGES) // 2:
-                        ax.set_xlabel("mm across block  (injection gap ~centre, magnet side →)",
+                        ax.set_xlabel("Distance across block (mm)",
                                       fontsize=8.5, labelpad=4)
                 else:
                     ax.set_xticks([])
