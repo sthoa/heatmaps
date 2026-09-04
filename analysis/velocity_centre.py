@@ -187,17 +187,20 @@ def main():
     for s, g in df.groupby("series"):
         g = g.sort_values("t")
         wall = g.wall_mm.median()
-        rise = g[(g.t <= T_RISE) & (g.front < wall - WALL_MARGIN)]
+        hit = g[g.front >= wall - WALL_MARGIN].t
+        t_end = min(T_RISE, hit.min()) if len(hit) else T_RISE      # window ends at the FIRST wall arrival
+        rise = g[g.t < t_end] if len(hit) and hit.min() <= T_RISE else g[g.t <= t_end]
         if len(rise) >= 3:
             v_front, b, rr, p, se = stats.linregress(rise.t, rise.front)
+            v_origin = float((rise.t * rise.front).sum() / (rise.t ** 2).sum()) if (rise.t ** 2).sum() > 0 else np.nan
         else:
-            v_front, se = np.nan, np.nan
+            v_front, se, v_origin = np.nan, np.nan, np.nan
         # d90 slope over the same window, for comparison with the earlier metrics
         rd = rise.dropna(subset=["d90"])
         v_d90 = stats.linregress(rd.t, rd.d90).slope if len(rd) >= 3 else np.nan
         g0 = g.iloc[0]
         vel.append(dict(day=g0.day, agarose=g0.agarose, arm=g0.arm, coating=g0.coating, series=s,
-                        v_front=v_front, v_front_se=se, v_d90=v_d90, n_rise=len(rise),
+                        v_front=v_front, v_front_se=se, v_origin=v_origin, v_d90=v_d90, n_rise=len(rise),
                         front_max=g.front.max(), front_6h=g[g.t == g.t.max()].front.iloc[0],
                         wall_mm=wall,
                         t_wall=float(g[g.front >= wall - WALL_MARGIN].t.min()) if (g.front >= wall - WALL_MARGIN).any() else np.nan))
@@ -206,6 +209,8 @@ def main():
 
     print("=== directional front velocity (magnet side minus far side), rising phase t <= 3 h, mm/h ===")
     print(V.groupby(["agarose", "arm"]).v_front.agg(["mean", "std", "count"]).round(3).to_string())
+    print("\nrobustness: slope through the origin instead of free intercept (mm/h)")
+    print(V.groupby(["agarose", "arm"]).v_origin.agg(["mean", "std"]).round(3).to_string())
     print("\nfor reference, one-sided fronts at 6 h (mm): magnet side | far side")
     six = df[df.t == 6.0].groupby(["agarose", "arm"])[["front_right", "front_left"]].mean().round(2)
     print(six.to_string())
@@ -221,7 +226,8 @@ def main():
     for thr in THR_SENS:
         col = f"front_thr{int(thr)}"; vals = {}
         for s_, g in df.groupby("series"):
-            g = g.sort_values("t"); w = g[(g.t <= T_RISE) & (g[col] < g.wall_mm.median() - WALL_MARGIN)]
+            g = g.sort_values("t"); wall_ = g.wall_mm.median(); hit_ = g[g[col] >= wall_ - WALL_MARGIN].t
+            w = g[g.t < min(T_RISE, hit_.min())] if len(hit_) and hit_.min() <= T_RISE else g[g.t <= T_RISE]
             if len(w) >= 3: vals[s_] = (g.agarose.iloc[0], g.arm.iloc[0], stats.linregress(w.t, w[col]).slope)
         vv = pd.DataFrame([dict(series=k, agarose=a, arm=b, v=c) for k, (a, b, c) in vals.items()])
         def mv(ag, arm): x = vv[(vv.agarose == ag) & (vv.arm == arm)].v; return x.mean()
@@ -245,47 +251,57 @@ def main():
         print(f"  large, {ag} {co}: {x.mean():.3f} ± {x.std():.3f} mm/h (n={len(x)})")
 
     # ---- figure ---------------------------------------------------------------
-    fig, (a1, a2) = plt.subplots(1, 2, figsize=(11.0, 4.4), gridspec_kw=dict(width_ratios=[1.45, 1]))
+    GRAD_RATIO, BGRAD_RATIO = 2.7, 10.6          # large/small at the 5 mm gap, from the fitted magnet models
+    plt.rcParams.update({"font.size": 10.5, "axes.labelsize": 10.5, "xtick.labelsize": 9.5, "ytick.labelsize": 9.5})
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=(9.4, 4.6), gridspec_kw=dict(width_ratios=[1.45, 1]))
+    LBL = {("0.4%", "large"): "0.4 % agarose, large magnet", ("0.4%", "small"): "0.4 % agarose, small magnet",
+           ("0.6%", "large"): "0.6 % agarose, large magnet"}
     for (ag, arm), g in df[df.arm != "control"].groupby(["agarose", "arm"]):
         col = C[(ag, arm)]
         p = g.pivot_table(index="t", columns="series", values="front")
         for c in p.columns:
-            a1.plot(p.index, p[c], color=col, lw=.7, alpha=.3)
-        a1.plot(p.index, p.mean(axis=1), color=col, lw=2.3, marker="o", ms=3.6,
-                label=f"{ag} agarose, {arm} magnet (n={p.shape[1]})")
+            a1.plot(p.index, p[c], color=col, lw=.7, alpha=.28)
+        a1.plot(p.index, p.mean(axis=1), color=col, lw=2.3, marker="o", ms=3.6, label=f"{LBL[(ag, arm)]} (n={p.shape[1]})")
+    shown = set()
     for s_, g in df[df.arm == "control"].groupby("series"):
-        ag = g.agarose.iloc[0]; co = g.coating.iloc[0]
-        a1.plot(g.t, g.front, color="#555", lw=1.1, ls="--" if ag == "0.6%" else ":", marker="s", ms=2.5,
-                label=f"control, {ag} {co}")
+        ag = g.agarose.iloc[0]
+        a1.plot(g.t, g.front, color="#666", lw=1.0, ls=":" if ag == "0.4%" else "--", marker="s", ms=2.3,
+                label=None if ag in shown else f"no-magnet controls, {ag} (n=2)")
+        shown.add(ag)
     wall = V.wall_mm.median()
-    a1.axhline(wall, color="#555", lw=.9, ls="-."); a1.text(6.08, wall, "block\nedge", fontsize=7.5, va="center", color="#555")
-    a1.axvspan(0, T_RISE, color="#000", alpha=.04, lw=0)
-    a1.text(T_RISE / 2, wall + 0.35, "velocity window", ha="center", fontsize=8, color="#666")
+    a1.axhline(wall, color="#555", lw=.9, ls="-."); a1.text(6.12, wall, "block\nedge", fontsize=7.5, va="center", color="#555")
+    a1.axvspan(0, T_RISE, color="#000", alpha=.045, lw=0)
+    a1.text(T_RISE / 2, -0.5, "fit window", ha="center", fontsize=8.3, color="#666")
     a1.set_xlabel("Time after magnet applied (h)"); a1.set_ylabel("Directional front, magnet side − far side (mm)")
-    a1.set_xlim(-0.1, 6.7); a1.set_ylim(-0.6, wall + 0.7); a1.legend(fontsize=7.4, frameon=False, loc="lower right", ncol=1)
+    a1.set_xlim(-0.1, 6.75); a1.set_ylim(-0.65, wall + 0.6)
+    a1.legend(fontsize=8.3, frameon=False, loc="upper left", bbox_to_anchor=(0.045, 0.94))
     a1.grid(alpha=.16, lw=.6)
 
     order = [("0.4%", "large"), ("0.4%", "small"), ("0.6%", "large")]
     for k, (ag, arm) in enumerate(order):
         v = V[(V.agarose == ag) & (V.arm == arm)].v_front.dropna()
-        a2.scatter(np.full(len(v), k) + np.linspace(-.12, .12, len(v)), v, color=C[(ag, arm)], s=26, zorder=3, alpha=.9)
-        a2.errorbar(k, v.mean(), yerr=v.std(), fmt="_", color="k", ms=22, mew=2, capsize=6, zorder=4)
+        a2.scatter(np.full(len(v), k) + np.linspace(-.13, .13, len(v)), v, color=C[(ag, arm)], s=28, zorder=3, alpha=.9, edgecolor="white", lw=.5)
+        a2.errorbar(k, v.mean(), yerr=v.std(), fmt="_", color="k", ms=24, mew=2, capsize=6, zorder=4)
     vs = V[(V.agarose == "0.4%") & (V.arm == "small")].v_front.mean()
-    a2.hlines(vs * 2.7, -0.35, 0.35, color=C[("0.4%", "large")], ls="--", lw=1.2)
-    a2.text(0.38, vs * 2.7, "small × 2.7\n(gradient ratio)", fontsize=7.5, va="center", color=C[("0.4%", "large")])
+    a2.hlines(vs * BGRAD_RATIO, -0.42, 0.42, color=C[("0.4%", "large")], ls="--", lw=1.1, label=f"small × {BGRAD_RATIO}  (B∇B ratio)")
+    a2.hlines(vs * GRAD_RATIO, -0.42, 0.42, color=C[("0.4%", "large")], ls=":", lw=1.4, label=f"small × {GRAD_RATIO}  (∇B ratio)")
+    a2.legend(fontsize=8.0, frameon=False, loc="upper right")
     for k, (ag, arm) in enumerate(order):
         v = V[(V.agarose == ag) & (V.arm == arm)].v_front
-        a2.text(k, -0.32, f"{v.mean():.2f} ± {v.std():.2f}", ha="center", fontsize=8)
+        a2.text(k, -0.42, f"{v.mean():.2f} ± {v.std():.2f}", ha="center", fontsize=8.8)
     a2.axhline(0, color="#888", lw=.8)
-    a2.set_xticks(range(3)); a2.set_xticklabels(["0.4 %\nlarge", "0.4 %\nsmall", "0.6 %\nlarge"], fontsize=9)
-    a2.set_ylabel("Front velocity, 0–3 h (mm/h)"); a2.set_ylim(-0.45, max(2.6, V.v_front.max() + 0.2)); a2.set_xlim(-0.6, 2.9)
+    a2.set_xticks(range(3)); a2.set_xticklabels(["0.4 %\nlarge", "0.4 %\nsmall", "0.6 %\nlarge"], fontsize=9.5)
+    a2.set_ylabel("Front velocity over the fit window (mm/h)"); a2.set_ylim(-0.55, 2.2); a2.set_xlim(-0.6, 2.75)
     a2.grid(alpha=.16, lw=.6, axis="y")
     for ax, lab in ((a1, "(a)"), (a2, "(b)")):
         for sp in ("top", "right"): ax.spines[sp].set_visible(False)
-        ax.text(0.02, 0.97, lab, transform=ax.transAxes, fontsize=11, fontweight="bold", va="top")
-    fig.tight_layout(w_pad=2.5)
+        ax.text(0.01, 0.995, lab, transform=ax.transAxes, fontsize=11, fontweight="bold", va="top")
+    fig.tight_layout(w_pad=2.2)
     OUT.mkdir(exist_ok=True)
     fig.savefig(OUT / "velocity_centre.png", dpi=200); fig.savefig(OUT / "velocity_centre.pdf")
+    thesis = Path(__file__).parent.parent / "thesis_draft" / "figures"
+    if thesis.exists():
+        fig.savefig(thesis / "velocity_centre.pdf"); fig.savefig(thesis / "velocity_centre.png", dpi=300)
     print("\nwrote outputs/velocity_centre.png, velocity_centre_series.csv, velocity_centre_frames.csv")
 
 
