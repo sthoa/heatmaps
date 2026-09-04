@@ -45,7 +45,7 @@ import make_block_atlas26 as A26
 from block26 import block_quad as quad26
 
 FRONT_THR = 25.0        # L* of change since t=0; about half the plateau level reached at the wall
-EDGE_SKIP = 0.4         # mm beyond the gap edge ignored when locating a front (reservoir-edge drift)
+EDGE_SKIP = 0.6         # mm beyond the gap edge ignored when locating a front (reservoir-edge drift reaches ~0.5 mm)
 START_WIN = 1.2         # mm: a plume must begin within this distance of the gap edge to count
 BRIDGE = 0.5            # mm: dips below threshold shorter than this do not end the plume
 THR_SENS = (15.0, 20.0, 25.0, 30.0, 35.0)   # thresholds for the sensitivity table
@@ -199,7 +199,8 @@ def main():
         rd = rise.dropna(subset=["d90"])
         v_d90 = stats.linregress(rd.t, rd.d90).slope if len(rd) >= 3 else np.nan
         g0 = g.iloc[0]
-        vel.append(dict(day=g0.day, agarose=g0.agarose, arm=g0.arm, coating=g0.coating, series=s,
+        resolved = bool((rise.front_right > 0).any())      # the magnet-side plume reached threshold at least once in the window
+        vel.append(dict(day=g0.day, agarose=g0.agarose, arm=g0.arm, coating=g0.coating, series=s, resolved=resolved,
                         v_front=v_front, v_front_se=se, v_origin=v_origin, v_d90=v_d90, n_rise=len(rise),
                         front_max=g.front.max(), front_6h=g[g.t == g.t.max()].front.iloc[0],
                         wall_mm=wall,
@@ -242,8 +243,8 @@ def main():
           f"(gradient ratio at the gap = 2.7)   Welch p={stats.ttest_ind(L4, S4, equal_var=False).pvalue:.4f}")
     print(f"0.4% vs 0.6%, large:    {L4.mean():.3f} vs {L6.mean():.3f} mm/h  ratio {L4.mean()/L6.mean():.2f}   "
           f"Welch p={stats.ttest_ind(L4, L6, equal_var=False).pvalue:.4f}")
-    print("\nper-series velocities (mm/h):")
-    print(V[["agarose", "arm", "coating", "series", "v_front", "n_rise", "front_6h"]].round(3).to_string(index=False))
+    print("\nper-series velocities (mm/h); resolved = magnet-side plume reached the threshold within the window:")
+    print(V[["agarose", "arm", "coating", "series", "v_front", "resolved", "n_rise", "front_6h"]].round(3).to_string(index=False))
     print("controls, individually (mm/h):")
     for r in V[V.arm == "control"].itertuples(): print(f"  {r.series:26s} {r.v_front:+.3f}")
     for ag, co in [("0.4%", "COOH"), ("0.4%", "PEG"), ("0.6%", "COOH"), ("0.6%", "PEG")]:
