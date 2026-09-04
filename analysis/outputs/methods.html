@@ -121,8 +121,8 @@ flowchart TD
   C --> D["Downscale<br/>long edge 1100 px"]
   D --> E["Find the agarose block<br/>method differs per day"]
   E --> F["Warp to a square<br/>480 &times; 480 px = 10 &times; 10 mm"]
-  F --> G["Darkness field<br/>255 &minus; L*, binned, floor removed"]
-  G --> H["Block heatmaps<br/>shared 0&ndash;55 scale"]
+  F --> G["Darkness field<br/>100 &minus; L*, binned, floor removed"]
+  G --> H["Block heatmaps<br/>shared 0&ndash;22 scale"]
   G --> I["Asymmetry<br/>magnet side &minus; far side"]
   I --> J["Plateau per series<br/>mean of 5&ndash;6 h"]
   J --> K["2 &times; 2 ANOVA<br/>agarose &times; coating"]
@@ -237,7 +237,7 @@ flowchart TD
     darkens, and that darkening is the measurement:</p>
     <ol>
       <li><b>Convert to LAB and keep L*</b>, the lightness channel, so the measure responds to how
-      dark a region is rather than to its hue. Darkness is <code>255 &minus; L*</code>.</li>
+      dark a region is rather than to its hue. Darkness is <code>100 &minus; L*</code> on the CIELAB scale (OpenCV stores L* as 0&ndash;255; it is rescaled to 0&ndash;100 before any value is reported).</li>
       <li><b>Median-bin in 11 &times; 11 px cells.</b> The median, not the mean, so a speck of dust,
       a bubble or a specular highlight cannot pull a cell.</li>
       <li><b>Subtract the frame's own gel floor</b>: the 15th percentile of the block interior.</li>
@@ -246,7 +246,7 @@ flowchart TD
     <div class="callout">
       <h4>Why the floor subtraction is the load-bearing step</h4>
       <p>A phone sets its own exposure for every shot. Across this dataset the measured lightness of
-      clean gel varies by about 30 L* between frames from auto-exposure alone &mdash; comparable to
+      clean gel varies by about 12 L* between frames from auto-exposure alone &mdash; comparable to
       the effects being reported. Any raw-darkness measure would be dominated by it.</p>
       <p>Subtracting each frame's own 15th-percentile interior value removes it. Every reported
       value is therefore <b>darkness above the clean gel in the same photograph</b>, never darkness
@@ -267,14 +267,14 @@ flowchart TD
     millimetres across the block with <span class="mono">x&nbsp;=&nbsp;0</span> at the block's left
     edge &mdash; where a back-injection gap sits &mdash; so centre-injection days put the gap near
     5 mm and all three days share one spatial convention.</p>
-    <p><b>All three days share one colour scale, 0 to 55 L*.</b> Auto-scaling each panel to its own
+    <p><b>All three days share one colour scale, 0 to 22 L*.</b> Auto-scaling each panel to its own
     range makes panels look better and misrepresents relative magnitude; an earlier version did this
     and made Aug 26 appear dimmer than Aug 23 although Aug 26 has the strongest signal of the three
     days.</p>
     <div class="callout caution">
       <h4>One heatmap artefact to declare</h4>
       <p>BSA gel is intrinsically cloudier than non-BSA gel &mdash; median raw block darkness about
-      129 against 106. On the shared scale, BSA controls therefore look nearly as bright as BSA
+      51 against 42. On the shared scale, BSA controls therefore look nearly as bright as BSA
       magnet arms. That is turbidity, not transport. For BSA conditions the heatmap is illustrative
       and the asymmetry metric below is the quantity to trust, because cloudiness affects both halves
       of the block equally and cancels in a difference.</p>
@@ -302,8 +302,8 @@ flowchart TD
     once at calibration.</p>
     <div class="callout">
       <h4>What the controls did</h4>
-      <p>All four non-BSA controls across both centre-injection days stayed within <b>&plusmn;4.4 L*</b>
-      of zero for the full six hours, with no trend. The magnet arms reach 13 to 42 L*. The
+      <p>All four non-BSA controls across both centre-injection days stayed within <b>&plusmn;1.7 L*</b>
+      of zero for the full six hours, with no trend. The magnet arms reach 5 to 16 L*. The
       separation is roughly fivefold, which is why the existence of transport is not in question even
       where comparisons between conditions are.</p>
     </div>
@@ -337,10 +337,10 @@ flowchart TD
       <caption>Plateau asymmetry, mean of 5&ndash;6 h, in L*. Three repeats per cell.</caption>
       <thead><tr><th>Cell</th><th>Repeat values</th><th class="num">Mean</th></tr></thead>
       <tbody>
-        <tr><td>0.4% &middot; COOH</td><td class="mono">46.0, 41.8, 36.4</td><td class="num">41.4</td></tr>
-        <tr><td>0.4% &middot; PEG</td><td class="mono">35.1, 45.0, 24.9</td><td class="num">35.0</td></tr>
-        <tr><td>0.6% &middot; COOH</td><td class="mono">12.8, 48.1, 36.2</td><td class="num">32.4</td></tr>
-        <tr><td>0.6% &middot; PEG</td><td class="mono">18.9, 14.5, 9.9</td><td class="num">14.4</td></tr>
+        <tr><td>0.4% &middot; COOH</td><td class="mono">18.0, 16.4, 14.3</td><td class="num">16.2</td></tr>
+        <tr><td>0.4% &middot; PEG</td><td class="mono">13.7, 17.7, 9.8</td><td class="num">13.7</td></tr>
+        <tr><td>0.6% &middot; COOH</td><td class="mono">5.0, 18.9, 14.2</td><td class="num">12.7</td></tr>
+        <tr><td>0.6% &middot; PEG</td><td class="mono">7.4, 5.7, 3.9</td><td class="num">5.7</td></tr>
       </tbody>
     </table>
     </div>
@@ -353,8 +353,8 @@ flowchart TD
       variation; p is the probability of an F at least this large if the factor did nothing.</caption>
       <thead><tr><th>Term</th><th class="num">Effect</th><th class="num">F</th><th class="num">p</th></tr></thead>
       <tbody>
-        <tr><td>Agarose 0.4% vs 0.6%</td><td class="num">+14.8 L*</td><td class="num dim">5.64</td><td class="num sig">0.045</td></tr>
-        <tr><td>Coating COOH vs PEG</td><td class="num">+12.2 L*</td><td class="num dim">3.82</td><td class="num warn">0.086</td></tr>
+        <tr><td>Agarose 0.4% vs 0.6%</td><td class="num">+5.8 L*</td><td class="num dim">5.64</td><td class="num sig">0.045</td></tr>
+        <tr><td>Coating COOH vs PEG</td><td class="num">+4.8 L*</td><td class="num dim">3.82</td><td class="num warn">0.086</td></tr>
         <tr><td>Coating &times; agarose interaction</td><td class="num">&mdash;</td><td class="num dim">0.85</td><td class="num">0.384</td></tr>
       </tbody>
     </table>
@@ -377,8 +377,8 @@ flowchart TD
     </div>
     <h3>The coating comparison within 0.6%</h3>
     <p>Within Aug 26 alone &mdash; one day, no cross-day confound &mdash; COOH leads PEG by
-    <b>+12.0 L*</b>, <span class="mono">F = 4.44, p = 0.064</span>, 95% confidence interval
-    <span class="mono">[&minus;0.9, +24.9]</span>, with BSA state as a blocking factor. The BSA block
+    <b>+4.7 L*</b>, <span class="mono">F = 4.44, p = 0.064</span>, 95% confidence interval
+    <span class="mono">[&minus;0.3, +9.8]</span>, with BSA state as a blocking factor. The BSA block
     is inert (<span class="mono">p = 0.69</span>), which justifies pooling the BSA and non-BSA arms
     into one test of coating. The interval crosses zero: a consistent direction whose size could be
     anywhere from nothing to large.</p>
@@ -400,7 +400,7 @@ flowchart TD
     marks. Per-sample migration rates from the two correlate at <b>r = 0.971</b> with an identical
     ordering of conditions. The result does not depend on how the block was found.</p>
     <h3>3 &middot; Controls sit at zero</h3>
-    <p>&plusmn;4.4 L* with no trend against signals of 13 to 42 L*. Controls pass through exactly the
+    <p>&plusmn;1.7 L* with no trend against signals of 5 to 16 L*. Controls pass through exactly the
     same code as magnet arms; nothing forces this.</p>
     <h3>4 &middot; An independent metric reproduces an earlier value</h3>
     <p>The back-injection depth measure, written separately, recovers the Aug 27 magnet effect at
@@ -416,10 +416,10 @@ flowchart TD
       <li><b>Agarose concentration is confounded with run day.</b> 0.4% is Aug 23 and 0.6% is
       Aug 26: different gel batch, different session lighting. The most serious limitation; no
       analysis removes it.</li>
-      <li><b>n = 3 per cell.</b> One 0.6% COOH repeat plateaus at 12.8 L* and another at 48.1. That
+      <li><b>n = 3 per cell.</b> One 0.6% COOH repeat plateaus at 5.0 L* and another at 18.9. That
       spread is why most contrasts miss significance.</li>
       <li><b>The coating &times; concentration interaction is not supported</b>
-      (<span class="mono">p = 0.38</span>). The coating gap looks wider at 0.6% (+17.9 vs +6.4 L*),
+      (<span class="mono">p = 0.38</span>). The coating gap looks wider at 0.6% (+7.0 vs +2.5 L*),
       but that comparison is the one that fails.</li>
       <li><b>One cell reverses the coating ordering:</b> Aug 23 small magnet, COOH 7.8 vs PEG 11.8.
       It is the cell with the least transport of any, but it exists.</li>
@@ -442,7 +442,7 @@ flowchart TD
 
     <details><summary>How do you know darkness means nanoparticles and not something else?</summary>
     <div class="a"><p>From the controls. A no-magnet control passes through identical gel, injection,
-    lighting and processing, and stays within &plusmn;4.4 L* of zero asymmetry for six hours. The
+    lighting and processing, and stays within &plusmn;1.7 L* of zero asymmetry for six hours. The
     only systematic difference in the magnet arms is the magnet. The darkening is also
     <strong>directional</strong>: it appears on the magnet side and grows towards it. Cloudiness,
     drying and lighting drift are not directional, and the asymmetry metric subtracts anything
@@ -510,8 +510,8 @@ flowchart TD
     thickness from particles at one face.</p></div></details>
 
     <details><summary>Why does BSA look so different in the heatmaps?</summary>
-    <div class="a"><p>BSA gel is intrinsically cloudier &mdash; median raw block darkness about 129
-    against 106 &mdash; so on the shared scale BSA controls look nearly as bright as BSA magnet arms.
+    <div class="a"><p>BSA gel is intrinsically cloudier &mdash; median raw block darkness about 51
+    against 42 &mdash; so on the shared scale BSA controls look nearly as bright as BSA magnet arms.
     That is turbidity, not transport, and is exactly what the asymmetry metric cancels. For BSA
     conditions cite the asymmetry numbers and treat the heatmap as illustrative.</p></div></details>
 

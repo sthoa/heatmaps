@@ -13,6 +13,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+from lab_units import L_SCALE
 import pandas as pd
 
 from block26 import block_quad
@@ -46,7 +47,7 @@ def main():
             D = process_abs(field(img, q))
             a0.imshow(cv2.cvtColor(cv2.resize(w, (220, 220)), cv2.COLOR_BGR2RGB),
                       extent=[0, 10, 10, 0], aspect="equal")
-            a1.imshow(D, cmap="inferno", vmin=0, vmax=55,
+            a1.imshow(D, cmap="inferno", vmin=0, vmax=A26.VMAX,
                       extent=[EXTENT_MM[0], EXTENT_MM[1], EXTENT_MM[1], EXTENT_MM[0]],
                       aspect="equal", interpolation="bilinear")
             if si == 0:

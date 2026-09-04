@@ -13,7 +13,7 @@ from block23_series import _desc, SIZE_TOL, SHAPE_TOL, ecc_shift, aligned_warp
 
 def field_of(w):
     L = cv2.cvtColor(w, cv2.COLOR_BGR2LAB)[..., 0].astype(np.float32)
-    D = (255.0 - L)[MARGIN:WARP - MARGIN, MARGIN:WARP - MARGIN]
+    D = ((255.0 - L) / L_SCALE)[MARGIN:WARP - MARGIN, MARGIN:WARP - MARGIN]
     h, wd = D.shape; hb, wb = h // 11, wd // 11
     return np.median(D[:hb*11, :wb*11].reshape(hb, 11, wb, 11), axis=(1, 3))
 

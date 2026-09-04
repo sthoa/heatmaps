@@ -52,7 +52,7 @@ def series_warp(img, ser, date, use_ecc=True):
 
 def prof_of(warp):
     L = cv2.cvtColor(warp, cv2.COLOR_BGR2LAB)[..., 0].astype(np.float32)
-    D = (255.0 - L)[M.MARGIN:M.WARP-M.MARGIN, M.MARGIN:M.WARP-M.MARGIN]
+    D = ((255.0 - L) / L_SCALE)[M.MARGIN:M.WARP-M.MARGIN, M.MARGIN:M.WARP-M.MARGIN]
     return N.excess(N.profile(D))
 
 def build(geom, perturb):

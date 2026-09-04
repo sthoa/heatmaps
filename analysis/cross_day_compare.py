@@ -186,6 +186,11 @@ if __name__ == "__main__":
     print("Aug 26 ...", flush=True); d26 = curves_26()
     df = pd.concat([d23, d26], ignore_index=True)
     df.to_csv(Path(__file__).parent / "cross_day_asymmetry.csv", index=False)
+    # one plateau value per series (mean of the 5-6 h points): the input to centre_stats.py
+    plateau = (df[df.arm != "control"].assign(plateau=lambda d: d.asym)
+               .query("t >= 5.0").groupby(["day", "agarose", "bsa", "arm", "coating", "series"], as_index=False)
+               .plateau.mean())
+    plateau.to_csv(Path(__file__).parent / "centre_plateau_by_series.csv", index=False)
     print(f"wrote cross_day_asymmetry.csv  n={len(df)}")
     print(df.groupby(["day", "arm"]).asym.describe()[["count", "mean", "50%"]])
     OUT.mkdir(exist_ok=True)

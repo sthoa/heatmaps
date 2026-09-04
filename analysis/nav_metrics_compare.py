@@ -40,7 +40,7 @@ def frame(path):
 def field(img, quad, date):
     w = M.warped_by_date(img, quad, date)
     L = cv2.cvtColor(w, cv2.COLOR_BGR2LAB)[...,0].astype(np.float32)
-    return (255.0-L)[M.MARGIN:M.WARP-M.MARGIN, M.MARGIN:M.WARP-M.MARGIN]
+    return ((255.0-L)/L_SCALE)[M.MARGIN:M.WARP-M.MARGIN, M.MARGIN:M.WARP-M.MARGIN]
 
 def profile(D):
     p = np.sort(D, axis=0); n = p.shape[0]

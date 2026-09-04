@@ -27,12 +27,13 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+from lab_units import L_SCALE
 import pandas as pd
 from scipy.ndimage import gaussian_filter, gaussian_filter1d
 
 S = Path("/private/tmp/claude-501/-Users-steven-NP-Experiments/d38dc98f-cc81-4670-b3a2-b557500370b1/scratchpad")
 STAGES = [1.0, 3.0, 6.0, 12.0, 21.5]
-VMAX = 55.0
+VMAX = 55.0 / L_SCALE   # 21.6 L*
 PXMM = lambda mm: int(round((mm + 1) / 11 * 480))
 BASE = dict(x0=PXMM(-1.0), x1=PXMM(9.5), y0=46, y1=434)
 
@@ -223,7 +224,7 @@ class SeriesGeom:
                 Mx = np.float32([[1, 0, fine], [0, 1, 0]])
                 img = cv2.warpAffine(img, Mx, (480, 480), flags=cv2.INTER_LINEAR)
         lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB).astype(np.float32)
-        D = (255.0 - lab[..., 0])[self.Y0:self.Y1, self.GL0:self.X1 - 8]
+        D = ((255.0 - lab[..., 0]) / L_SCALE)[self.Y0:self.Y1, self.GL0:self.X1 - 8]
         return cv2.resize(D, (44, 40), interpolation=cv2.INTER_AREA)
 
 
@@ -306,6 +307,8 @@ def main():
     m = pd.read_csv("photos_final.csv", dtype={"agarose_f": str})
     wr = pd.read_csv("warp_report.csv")
     badset = set(wr[~wr.refined]["idx"])
+    # frames whose warped image is absent (well detection failed on a regenerated run) are skipped too
+    badset |= {int(i) for i in m.idx if not (S / "prep" / "warped" / f"{int(i):04d}.jpg").exists()}
     outdir = S / "heatpanels_block"
     outdir.mkdir(exist_ok=True)
 
@@ -364,7 +367,7 @@ def main():
         cax = fig.add_axes([0.32, 0.045, 0.36, 0.02])
         sm = plt.cm.ScalarMappable(cmap="inferno", norm=plt.Normalize(0, VMAX))
         cb = fig.colorbar(sm, cax=cax, orientation="horizontal")
-        cb.set_ticks([0, 25, 55]); cb.ax.tick_params(labelsize=6, pad=1)
+        cb.set_ticks([0, 10, 20]); cb.ax.tick_params(labelsize=6, pad=1)
         cb.set_label("NP darkness above gel floor (L*)", fontsize=6.5)
         plt.savefig(outdir / f"{ag}_{bsa}_{co}.png", dpi=118)
         plt.close(fig)

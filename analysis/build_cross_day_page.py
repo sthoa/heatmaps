@@ -7,17 +7,17 @@ img = base64.b64encode((OUT / "cross_day_comparison.png").read_bytes()).decode()
 
 # 2x2 factorial, non-BSA large-magnet arms, n=12 series (cross_day_compare.py)
 FACTORIAL = [
-    ("Agarose 0.4% vs 0.6%", "+14.8 L*", "5.64", "0.045", 2),
-    ("Coating COOH vs PEG", "+12.2 L*", "3.82", "0.086", 1),
+    ("Agarose 0.4% vs 0.6%", "+5.8 L*", "5.64", "0.045", 2),
+    ("Coating COOH vs PEG", "+4.8 L*", "3.82", "0.086", 1),
     ("Coating &times; agarose interaction", "&mdash;", "0.85", "0.384", 0),
 ]
 
 # plateau (5-6 h mean) per condition cell
 CELLS = [
-    ("Aug 23 &middot; 0.4% &middot; non-BSA &middot; large", "41.4", "35.0", "+6.4", 1),
-    ("Aug 26 &middot; 0.6% &middot; BSA &middot; large", "28.8", "22.7", "+6.1", 1),
-    ("Aug 26 &middot; 0.6% &middot; non-BSA &middot; large", "32.4", "14.4", "+17.9", 1),
-    ("Aug 23 &middot; 0.4% &middot; non-BSA &middot; small", "7.8", "11.8", "&minus;4.0", 0),
+    ("Aug 23 &middot; 0.4% &middot; non-BSA &middot; large", "16.2", "13.7", "+2.5", 1),
+    ("Aug 26 &middot; 0.6% &middot; BSA &middot; large", "11.3", "8.9", "+2.4", 1),
+    ("Aug 26 &middot; 0.6% &middot; non-BSA &middot; large", "12.7", "5.7", "+7.0", 1),
+    ("Aug 23 &middot; 0.4% &middot; non-BSA &middot; small", "3.1", "4.6", "&minus;1.6", 0),
 ]
 
 BACK = [
@@ -170,8 +170,8 @@ footer a:hover, footer a:focus-visible {{ border-bottom-color:var(--accent); }}
   </table>
   </div>
   <p class="col" style="margin-top:18px">Within the 0.6% run on its own &mdash; Aug 26, one day, BSA
-  as a blocking factor, n=12 &mdash; COOH leads PEG by <span class="mono">+12.0&nbsp;L*</span>,
-  <span class="mono">F=4.44, p=0.064</span>, 95% CI <span class="mono">[&minus;0.9, +24.9]</span>.
+  as a blocking factor, n=12 &mdash; COOH leads PEG by <span class="mono">+4.7&nbsp;L*</span>,
+  <span class="mono">F=4.44, p=0.064</span>, 95% CI <span class="mono">[&minus;0.3, +9.8]</span>.
   The BSA block itself is inert (<span class="mono">p=0.69</span>), which is what justifies pooling
   the two albumin states.</p>
 </section>
@@ -189,7 +189,7 @@ footer a:hover, footer a:focus-visible {{ border-bottom-color:var(--accent); }}
   </table>
   </div>
   <p class="col" style="margin-top:14px">The exception is the small-magnet arm, and it is the cell
-  with almost no transport to compare &mdash; 7.8 and 11.8&nbsp;L* against 22.7 to 41.4 everywhere
+  with almost no transport to compare &mdash; 3.1 and 4.6&nbsp;L* against 8.9 to 16.2 everywhere
   else. That is the same floor problem that makes the back-injection run uninformative, so it is weak
   evidence rather than a clean contradiction. A sign test over four cells has no power to settle it
   either way (<span class="mono">p=0.31</span>).</p>
@@ -206,7 +206,7 @@ footer a:hover, footer a:focus-visible {{ border-bottom-color:var(--accent); }}
   <span class="mono">p=0.086</span> across the factorial, <span class="mono">p=0.064</span> within the
   0.6% run alone, COOH ahead in three of the four cells.</p>
   <p><strong>The claim that PEG is hindered <em>more</em> at 0.6% is not supported.</strong> The
-  coating gap does look wider there &mdash; +17.9&nbsp;L* against +6.4 &mdash; but that comparison is
+  coating gap does look wider there &mdash; +7.0&nbsp;L* against +2.5 &mdash; but that comparison is
   the interaction term, and it tests at <span class="mono">p=0.38</span>. Describing the pattern is
   fair; asserting that the two concentrations differ in how much coating matters is not.</p>
 </section>
@@ -245,10 +245,10 @@ footer a:hover, footer a:focus-visible {{ border-bottom-color:var(--accent); }}
       <li>Softer gel transported further in both coatings &mdash; significant in the factorial
       (<span class="mono">p=0.045</span>), with the day confound stated alongside it.</li>
       <li>COOH transported further than PEG in three of four cells, and by
-      <span class="mono">+12.0&nbsp;L*</span> within the 0.6% run
+      <span class="mono">+4.7&nbsp;L*</span> within the 0.6% run
       (<span class="mono">p=0.064</span>).</li>
       <li>Every magnet arm separates cleanly from the control envelope, which stays within
-      &plusmn;4.4&nbsp;L* for six hours across both days.</li>
+      &plusmn;1.7&nbsp;L* for six hours across both days.</li>
     </ul>
   </div>
   <div class="card no">
@@ -259,8 +259,8 @@ footer a:hover, footer a:focus-visible {{ border-bottom-color:var(--accent); }}
       <li>Agarose concentration and run day are perfectly confounded in this comparison.</li>
       <li>The small-magnet cell reverses the coating ordering &mdash; in the one cell where transport
       was near the floor.</li>
-      <li>Repeat scatter is the binding limit: one 0.6% COOH repeat plateaus at 12.8&nbsp;L*, another
-      at 48.1.</li>
+      <li>Repeat scatter is the binding limit: one 0.6% COOH repeat plateaus at 5.0&nbsp;L*, another
+      at 18.9.</li>
     </ul>
   </div>
 </section>

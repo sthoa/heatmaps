@@ -43,6 +43,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+from lab_units import L_SCALE
 import pandas as pd
 from scipy import stats
 
@@ -50,12 +51,12 @@ import make_block_atlas23 as A23
 import make_block_atlas26 as A26
 from block26 import block_quad as quad26
 
-FRONT_THR = 25.0        # L* of change since t=0: the BULK front, about half the plateau level reached at the wall
-LEAD_THR = 15.0         # L*: the LEADING front, the faintest level clear of the control blocks' noise
+FRONT_THR = 25.0 / L_SCALE        # L* of change since t=0: the BULK front, about half the plateau level reached at the wall
+LEAD_THR = 15.0 / L_SCALE         # L*: the LEADING front, the faintest level clear of the control blocks' noise
 EDGE_SKIP = 0.6         # mm beyond the gap edge ignored when locating a front (reservoir-edge drift reaches ~0.5 mm)
 START_WIN = 1.2         # mm: a plume must begin within this distance of the gap edge to count
 BRIDGE = 0.5            # mm: dips below threshold shorter than this do not end the plume
-THR_SENS = (15.0, 20.0, 25.0, 30.0, 35.0)   # thresholds for the sensitivity table
+THR_SENS = tuple(t / L_SCALE for t in (15.0, 20.0, 25.0, 30.0, 35.0))   # thresholds for the sensitivity table
 SMOOTH_PX = 9           # moving average over ~0.2 mm before walking the front
 T_RISE = 3.0            # h; short window (the rising phase)
 T_FULL = 6.0            # h; whole run. Both windows stop at the front's first arrival at the wall
@@ -69,13 +70,13 @@ C = {("0.4%", "large"): "#C0392B", ("0.4%", "small"): "#E67E22", ("0.6%", "large
 def raw_field_23(img, quad, date):
     w = A23.warped_by_date(img, quad, date)
     L = cv2.cvtColor(w, cv2.COLOR_BGR2LAB)[..., 0].astype(np.float32)
-    return (255.0 - L)[A23.MARGIN:A23.WARP - A23.MARGIN, A23.MARGIN:A23.WARP - A23.MARGIN]
+    return ((255.0 - L) / L_SCALE)[A23.MARGIN:A23.WARP - A23.MARGIN, A23.MARGIN:A23.WARP - A23.MARGIN]
 
 
 def raw_field_26(img, quad):
     w = A26.warped(img, quad)
     L = cv2.cvtColor(w, cv2.COLOR_BGR2LAB)[..., 0].astype(np.float32)
-    return (255.0 - L)[A26.MARGIN:A26.WARP - A26.MARGIN, A26.MARGIN:A26.WARP - A26.MARGIN]
+    return ((255.0 - L) / L_SCALE)[A26.MARGIN:A26.WARP - A26.MARGIN, A26.MARGIN:A26.WARP - A26.MARGIN]
 
 
 def excess_profile(D):
@@ -141,7 +142,7 @@ def fronts(e, e0, l, r):
     fr, fl = side_front(right), side_front(left)
     d = (np.arange(right.size) + 1) * MM_PER_PX
     m = float(right.sum())
-    sens = {f"front_thr{int(t)}": side_front(right, t) - side_front(left, t) for t in THR_SENS}
+    sens = {f"front_thr{int(round(t * L_SCALE))}": side_front(right, t) - side_front(left, t) for t in THR_SENS}
     return dict(front_right=fr, front_left=fl, front=fr - fl, wall_mm=float(d[-1]), **sens,
                 centroid=float((d * right).sum() / m) if m > 0 else np.nan,
                 d90=float(np.interp(0.9, np.cumsum(right) / m, d)) if m > 0 else np.nan)
@@ -256,7 +257,7 @@ def main():
     hdr = f"{'thr (L*)':>9s}" + "".join(f"{c:>14s}" for c in ["0.4% large", "0.4% small", "0.6% large", "controls"]) + f"{'L/S ratio':>11s}"
     print(hdr)
     for thr in THR_SENS:
-        col = f"front_thr{int(thr)}"; vals = {}
+        col = f"front_thr{int(round(thr * L_SCALE))}"; vals = {}
         for s_, g in df.groupby("series"):
             g = g.sort_values("t"); wall_ = g.wall_mm.median(); hit_ = g[g[col] >= wall_ - WALL_MARGIN].t
             w = g[g.t < min(T_RISE, hit_.min())] if len(hit_) and hit_.min() <= T_RISE else g[g.t <= T_RISE]

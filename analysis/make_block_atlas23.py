@@ -24,13 +24,14 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+from lab_units import L_SCALE
 import pandas as pd
 from scipy.ndimage import gaussian_filter, gaussian_filter1d
 
 S = Path("/private/tmp/claude-501/-Users-steven-NP-Experiments/d38dc98f-cc81-4670-b3a2-b557500370b1/scratchpad/aug23")
 WARP = 480
 STAGES = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-VMAX = 55.0
+VMAX = 55.0 / L_SCALE   # 21.6 L*
 
 
 def gel_mask(img):
@@ -169,7 +170,7 @@ def gap_axis_ok(warp):
 def field(img, rect, side):
     warp, _ = warped_block(img, rect, side)
     L = cv2.cvtColor(warp, cv2.COLOR_BGR2LAB)[..., 0].astype(np.float32)
-    D = (255.0 - L)[26:WARP - 26, 20:WARP - 20]
+    D = ((255.0 - L) / L_SCALE)[26:WARP - 26, 20:WARP - 20]
     h, w = D.shape
     hb, wb = h // 11, w // 11
     Db = np.median(D[: hb * 11, : wb * 11].reshape(hb, 11, wb, 11), axis=(1, 3))
@@ -215,7 +216,7 @@ EXTENT_MM = (MARGIN / WARP * 10.0, 10.0 - MARGIN / WARP * 10.0)
 def field_by_date(img, quad, date):
     w = warped_by_date(img, quad, date)
     L = cv2.cvtColor(w, cv2.COLOR_BGR2LAB)[..., 0].astype(np.float32)
-    D = (255.0 - L)[MARGIN:WARP - MARGIN, MARGIN:WARP - MARGIN]
+    D = ((255.0 - L) / L_SCALE)[MARGIN:WARP - MARGIN, MARGIN:WARP - MARGIN]
     h, wd = D.shape
     hb, wb = h // 11, wd // 11
     return np.median(D[: hb * 11, : wb * 11].reshape(hb, 11, wb, 11), axis=(1, 3))
@@ -302,7 +303,7 @@ def main(title=True, outdir=None, dpi=118, scale=1.0):
         cax = fig.add_axes([0.34, 0.055, 0.32, 0.016])
         sm = plt.cm.ScalarMappable(cmap="inferno", norm=plt.Normalize(0, VMAX))
         cb = fig.colorbar(sm, cax=cax, orientation="horizontal")
-        cb.set_ticks([0, 25, 55]); cb.ax.tick_params(labelsize=6, pad=1)
+        cb.set_ticks([0, 10, 20]); cb.ax.tick_params(labelsize=6, pad=1)
         cb.set_label("NP darkness above gel floor (L*)", fontsize=7, labelpad=2)
         plt.savefig(outdir / f"{coating}.png", dpi=dpi)
         plt.close(fig)

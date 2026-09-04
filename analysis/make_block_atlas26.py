@@ -23,6 +23,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+from lab_units import L_SCALE
 import pandas as pd
 from scipy.ndimage import gaussian_filter
 
@@ -33,7 +34,7 @@ WARP = 480
 MARGIN = 38  # ~0.8 mm trimmed per side: the gel separates from the holder late on
 EXTENT_MM = (MARGIN / WARP * 10.0, 10.0 - MARGIN / WARP * 10.0)
 STAGES = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-VMAX = 55.0
+VMAX = 55.0 / L_SCALE   # 21.6 L*
 
 
 def warped(img, quad):
@@ -44,7 +45,7 @@ def warped(img, quad):
 def field(img, quad):
     w = warped(img, quad)
     L = cv2.cvtColor(w, cv2.COLOR_BGR2LAB)[..., 0].astype(np.float32)
-    D = (255.0 - L)[MARGIN:WARP - MARGIN, MARGIN:WARP - MARGIN]
+    D = ((255.0 - L) / L_SCALE)[MARGIN:WARP - MARGIN, MARGIN:WARP - MARGIN]
     h, wd = D.shape
     hb, wb = h // 11, wd // 11
     return np.median(D[: hb * 11, : wb * 11].reshape(hb, 11, wb, 11), axis=(1, 3))
@@ -69,7 +70,7 @@ def main(title=True, outdir=None, dpi=118, scale=1.0):
     for bsa, bg in m.groupby("bsa"):
         # One shared 0-VMAX scale across BSA, non-BSA and the other experiment
         # days, so panels are directly comparable. BSA gel is intrinsically
-        # cloudier (median raw darkness ~129 vs ~106 for non-BSA), so its controls
+        # cloudier (median raw darkness ~51 vs ~42 L* for non-BSA), so its controls
         # saturate at this ceiling - that is the cloudiness, not transport, and
         # the asymmetry metric is the readout to trust for BSA.
         vmax = VMAX
