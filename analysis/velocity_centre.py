@@ -24,9 +24,13 @@ Per frame (same field extraction as nav_metrics_compare / cross_day_compare):
       centroid  excess-weighted mean distance
       d90       distance containing 90 % of the excess
 
-Per series: velocity = least-squares slope of front vs time, in two windows --
-the rising phase (0-3 h) and the whole run (0-6 h) -- each stopping at the
-front's first arrival within WALL_MARGIN of the block edge.
+Per series, the primary velocity is the PEAK ADVANCE RATE over the run: the
+furthest position the (3-point median smoothed) directional front reached,
+divided by the time it took to get there. It stops the clock when the front
+stops -- at the wall for the fast blocks -- and is not pulled down by the late
+symmetric spreading that makes a straight-line fit through six hours read
+negative for the weakest plumes. Regression slopes over 0-3 h and 0-6 h
+(each truncated at wall arrival) are kept for reference.
 The block edge is only ~4.3 mm from the gap and the large-magnet front reaches
 it by ~3 h; fitting through the parked phase would return the wall distance
 divided by the run time (0.7 mm/h for every fast block) rather than a velocity.
@@ -205,6 +209,13 @@ def main():
 
         v_front, se, n_rise, resolved = fit("front", "front_right")
         v_full, se_full, n_full, resolved_full = fit("front", "front_right", T_FULL)
+        # PRIMARY whole-run velocity: peak advance rate = furthest the (3-point median smoothed) directional
+        # front reached in the run / time taken to reach it. Unaffected by the wall (the clock stops when the
+        # front stops) and by late back-drift as the reservoir spreads symmetrically; never negative.
+        fsm = g.front.rolling(3, center=True, min_periods=1).median().to_numpy(); tt = g.t.to_numpy()
+        kpk = int(np.argmax(fsm))
+        v_peak = max(fsm[kpk], 0.0) / tt[kpk] if tt[kpk] > 0 else 0.0
+        t_peak = tt[kpk]
         # leading-edge (15 L*) front: the magnet-side leading front alone tells whether it resolved
         g["_lead_right"] = np.nan
         v_lead, se_l, n_lead, res_lead = fit("front_lead", "front_lead")
@@ -216,6 +227,7 @@ def main():
         vel.append(dict(day=g0.day, agarose=g0.agarose, arm=g0.arm, coating=g0.coating, series=s, resolved=resolved,
                         v_front=v_front, v_front_se=se, v_origin=v_origin, v_d90=v_d90, n_rise=n_rise,
                         v_full=v_full, resolved_full=resolved_full, n_full=n_full,
+                        v_peak=v_peak, t_peak=t_peak, front_peak=float(fsm[kpk]),
                         v_lead=v_lead, resolved_lead=res_lead,
                         front_max=g.front.max(), front_6h=g[g.t == g.t.max()].front.iloc[0],
                         wall_mm=wall,
@@ -258,8 +270,11 @@ def main():
           f"(gradient ratio at the gap = 2.7)   Welch p={stats.ttest_ind(L4, S4, equal_var=False).pvalue:.4f}")
     print(f"0.4% vs 0.6%, large:    {L4.mean():.3f} vs {L6.mean():.3f} mm/h  ratio {L4.mean()/L6.mean():.2f}   "
           f"Welch p={stats.ttest_ind(L4, L6, equal_var=False).pvalue:.4f}")
-    print("\nper-series velocities (mm/h): bulk front (25 L*) and leading front (15 L*); resolved = plume reached the level within the window")
-    print(V[["agarose", "arm", "coating", "series", "v_front", "resolved", "v_full", "resolved_full", "n_rise", "n_full"]].round(2).to_string(index=False))
+    print("\nper-series: PEAK ADVANCE RATE over the run (primary), regression slopes 0-3 h and 0-6 h for reference")
+    print(V[["agarose", "arm", "coating", "series", "resolved", "v_peak", "t_peak", "front_peak", "v_front", "v_full"]].round(2).to_string(index=False))
+    d = V[V.resolved & (V.arm != "control")]
+    print("\npeak advance rate by cell (resolved blocks):")
+    print(d.groupby(["agarose", "arm", "coating"]).v_peak.agg(["mean", "std", "count"]).round(2).to_string())
     print("\nleading front (15 L*) by condition:")
     print(V.groupby(["agarose", "arm"]).v_lead.agg(["mean", "std", "count"]).round(3).to_string())
     print("controls, individually (mm/h):")
