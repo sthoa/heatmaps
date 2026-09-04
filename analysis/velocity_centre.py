@@ -216,6 +216,7 @@ def main():
         kpk = int(np.argmax(fsm))
         v_peak = max(fsm[kpk], 0.0) / tt[kpk] if tt[kpk] > 0 else 0.0
         t_peak = tt[kpk]
+        resolved_run = bool((g.front_right > 0).any())     # plume reached the front level at some point in the run
         # leading-edge (15 L*) front: the magnet-side leading front alone tells whether it resolved
         g["_lead_right"] = np.nan
         v_lead, se_l, n_lead, res_lead = fit("front_lead", "front_lead")
@@ -227,7 +228,7 @@ def main():
         vel.append(dict(day=g0.day, agarose=g0.agarose, arm=g0.arm, coating=g0.coating, series=s, resolved=resolved,
                         v_front=v_front, v_front_se=se, v_origin=v_origin, v_d90=v_d90, n_rise=n_rise,
                         v_full=v_full, resolved_full=resolved_full, n_full=n_full,
-                        v_peak=v_peak, t_peak=t_peak, front_peak=float(fsm[kpk]),
+                        v_peak=v_peak, t_peak=t_peak, front_peak=float(fsm[kpk]), resolved_run=resolved_run,
                         v_lead=v_lead, resolved_lead=res_lead,
                         front_max=g.front.max(), front_6h=g[g.t == g.t.max()].front.iloc[0],
                         wall_mm=wall,
@@ -272,8 +273,8 @@ def main():
           f"Welch p={stats.ttest_ind(L4, L6, equal_var=False).pvalue:.4f}")
     print("\nper-series: PEAK ADVANCE RATE over the run (primary), regression slopes 0-3 h and 0-6 h for reference")
     print(V[["agarose", "arm", "coating", "series", "resolved", "v_peak", "t_peak", "front_peak", "v_front", "v_full"]].round(2).to_string(index=False))
-    d = V[V.resolved & (V.arm != "control")]
-    print("\npeak advance rate by cell (resolved blocks):")
+    d = V[V.resolved_run & (V.arm != "control")]
+    print("\npeak advance rate by cell (blocks whose plume reached the level at any time in the run):")
     print(d.groupby(["agarose", "arm", "coating"]).v_peak.agg(["mean", "std", "count"]).round(2).to_string())
     print("\nleading front (15 L*) by condition:")
     print(V.groupby(["agarose", "arm"]).v_lead.agg(["mean", "std", "count"]).round(3).to_string())
