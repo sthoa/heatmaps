@@ -44,7 +44,8 @@ import make_block_atlas23 as A23
 import make_block_atlas26 as A26
 from block26 import block_quad as quad26
 
-FRONT_THR = 25.0        # L* of change since t=0; about half the plateau level reached at the wall
+FRONT_THR = 25.0        # L* of change since t=0: the BULK front, about half the plateau level reached at the wall
+LEAD_THR = 15.0         # L*: the LEADING front, the faintest level clear of the control blocks' noise
 EDGE_SKIP = 0.6         # mm beyond the gap edge ignored when locating a front (reservoir-edge drift reaches ~0.5 mm)
 START_WIN = 1.2         # mm: a plume must begin within this distance of the gap edge to count
 BRIDGE = 0.5            # mm: dips below threshold shorter than this do not end the plume
@@ -169,12 +170,13 @@ def main():
         t0 = [f for f in fs if f["t"] == min(x["t"] for x in fs)]
         base = next((f for f in t0 if f["magnet_on"]), t0[0])          # magnet-attached t=0 where it exists
         e0 = excess_profile(base["D"]); l0, r0 = gap_edges(e0)
-        seen = set()
+        seen, prof = set(), []
         for f in fs:
             if f["t"] in seen: continue                                  # one frame per time point
-            seen.add(f["t"])
-            e = excess_profile(f["D"])
+            seen.add(f["t"]); prof.append((f, excess_profile(f["D"])))
+        for f, e in prof:
             ms = fronts(e, e0, l0, r0)
+            ms["front_lead"] = ms["front_thr15"]
             recs.append({k: v for k, v in f.items() if k not in ("D", "magnet_on")} | ms | dict(gap_mm=(r0 - l0) * MM_PER_PX))
     df = pd.DataFrame(recs).sort_values(["series", "t"])
     bad = df.wall_mm.isna().sum()
@@ -187,28 +189,35 @@ def main():
     for s, g in df.groupby("series"):
         g = g.sort_values("t")
         wall = g.wall_mm.median()
-        hit = g[g.front >= wall - WALL_MARGIN].t
-        t_end = min(T_RISE, hit.min()) if len(hit) else T_RISE      # window ends at the FIRST wall arrival
-        rise = g[g.t < t_end] if len(hit) and hit.min() <= T_RISE else g[g.t <= t_end]
-        if len(rise) >= 3:
-            v_front, b, rr, p, se = stats.linregress(rise.t, rise.front)
-            v_origin = float((rise.t * rise.front).sum() / (rise.t ** 2).sum()) if (rise.t ** 2).sum() > 0 else np.nan
-        else:
-            v_front, se, v_origin = np.nan, np.nan, np.nan
-        # d90 slope over the same window, for comparison with the earlier metrics
-        rd = rise.dropna(subset=["d90"])
+
+        def fit(col, side_col):
+            hit = g[g[col] >= wall - WALL_MARGIN].t
+            t_end = min(T_RISE, hit.min()) if len(hit) else T_RISE
+            rise = g[g.t < t_end] if len(hit) and hit.min() <= T_RISE else g[g.t <= t_end]
+            if len(rise) < 3:
+                return np.nan, np.nan, len(rise), False
+            v, b, rr, p_, se = stats.linregress(rise.t, rise[col])
+            return v, se, len(rise), bool((rise[side_col] > 0).any())
+
+        v_front, se, n_rise, resolved = fit("front", "front_right")
+        # leading-edge (15 L*) front: the magnet-side leading front alone tells whether it resolved
+        g["_lead_right"] = np.nan
+        v_lead, se_l, n_lead, res_lead = fit("front_lead", "front_lead")
+        rd = g[(g.t <= T_RISE)].dropna(subset=["d90"])
         v_d90 = stats.linregress(rd.t, rd.d90).slope if len(rd) >= 3 else np.nan
+        rise = g[g.t <= T_RISE]
+        v_origin = float((rise.t * rise.front).sum() / (rise.t ** 2).sum()) if (rise.t ** 2).sum() > 0 else np.nan
         g0 = g.iloc[0]
-        resolved = bool((rise.front_right > 0).any())      # the magnet-side plume reached threshold at least once in the window
         vel.append(dict(day=g0.day, agarose=g0.agarose, arm=g0.arm, coating=g0.coating, series=s, resolved=resolved,
-                        v_front=v_front, v_front_se=se, v_origin=v_origin, v_d90=v_d90, n_rise=len(rise),
+                        v_front=v_front, v_front_se=se, v_origin=v_origin, v_d90=v_d90, n_rise=n_rise,
+                        v_lead=v_lead, resolved_lead=res_lead,
                         front_max=g.front.max(), front_6h=g[g.t == g.t.max()].front.iloc[0],
                         wall_mm=wall,
                         t_wall=float(g[g.front >= wall - WALL_MARGIN].t.min()) if (g.front >= wall - WALL_MARGIN).any() else np.nan))
     V = pd.DataFrame(vel)
     V.to_csv(Path(__file__).parent / "velocity_centre_series.csv", index=False)
 
-    print("=== directional front velocity (magnet side minus far side), rising phase t <= 3 h, mm/h ===")
+    print("\n=== directional front velocity (magnet side minus far side), rising phase t <= 3 h, mm/h ===")
     print(V.groupby(["agarose", "arm"]).v_front.agg(["mean", "std", "count"]).round(3).to_string())
     print("\nrobustness: slope through the origin instead of free intercept (mm/h)")
     print(V.groupby(["agarose", "arm"]).v_origin.agg(["mean", "std"]).round(3).to_string())
@@ -243,8 +252,10 @@ def main():
           f"(gradient ratio at the gap = 2.7)   Welch p={stats.ttest_ind(L4, S4, equal_var=False).pvalue:.4f}")
     print(f"0.4% vs 0.6%, large:    {L4.mean():.3f} vs {L6.mean():.3f} mm/h  ratio {L4.mean()/L6.mean():.2f}   "
           f"Welch p={stats.ttest_ind(L4, L6, equal_var=False).pvalue:.4f}")
-    print("\nper-series velocities (mm/h); resolved = magnet-side plume reached the threshold within the window:")
-    print(V[["agarose", "arm", "coating", "series", "v_front", "resolved", "n_rise", "front_6h"]].round(3).to_string(index=False))
+    print("\nper-series velocities (mm/h): bulk front (25 L*) and leading front (15 L*); resolved = plume reached the level within the window")
+    print(V[["agarose", "arm", "coating", "series", "v_front", "resolved", "v_lead", "resolved_lead", "n_rise"]].round(2).to_string(index=False))
+    print("\nleading front (15 L*) by condition:")
+    print(V.groupby(["agarose", "arm"]).v_lead.agg(["mean", "std", "count"]).round(3).to_string())
     print("controls, individually (mm/h):")
     for r in V[V.arm == "control"].itertuples(): print(f"  {r.series:26s} {r.v_front:+.3f}")
     for ag, co in [("0.4%", "COOH"), ("0.4%", "PEG"), ("0.6%", "COOH"), ("0.6%", "PEG")]:
