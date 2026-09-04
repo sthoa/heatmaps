@@ -51,12 +51,12 @@ import make_block_atlas23 as A23
 import make_block_atlas26 as A26
 from block26 import block_quad as quad26
 
-FRONT_THR = 15.0 / L_SCALE        # L* of change since t=0 (5.9): the lowest level at which every control block still reads zero
-LEAD_THR = 15.0 / L_SCALE         # kept equal to FRONT_THR; retained so older columns keep their names
+FRONT_THR = 6.0         # L* of change since t=0: the lowest level at which every control block still reads zero
+LEAD_THR = FRONT_THR    # kept equal to FRONT_THR; retained so older columns keep their names
 EDGE_SKIP = 0.6         # mm beyond the gap edge ignored when locating a front (reservoir-edge drift reaches ~0.5 mm)
 START_WIN = 1.2         # mm: a plume must begin within this distance of the gap edge to count
 BRIDGE = 0.5            # mm: dips below threshold shorter than this do not end the plume
-THR_SENS = tuple(t / L_SCALE for t in (15.0, 20.0, 25.0, 30.0, 35.0))   # thresholds for the sensitivity table
+THR_SENS = (6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0, 22.0)   # L*; levels for the sensitivity table
 SMOOTH_PX = 9           # moving average over ~0.2 mm before walking the front
 T_RISE = 3.0            # h; short window (the rising phase)
 T_FULL = 6.0            # h; whole run. Both windows stop at the front's first arrival at the wall
@@ -142,7 +142,7 @@ def fronts(e, e0, l, r):
     fr, fl = side_front(right), side_front(left)
     d = (np.arange(right.size) + 1) * MM_PER_PX
     m = float(right.sum())
-    sens = {f"front_thr{int(round(t * L_SCALE))}": side_front(right, t) - side_front(left, t) for t in THR_SENS}
+    sens = {f"front_L{int(t)}": side_front(right, t) - side_front(left, t) for t in THR_SENS}
     return dict(front_right=fr, front_left=fl, front=fr - fl, wall_mm=float(d[-1]), **sens,
                 centroid=float((d * right).sum() / m) if m > 0 else np.nan,
                 d90=float(np.interp(0.9, np.cumsum(right) / m, d)) if m > 0 else np.nan)
@@ -184,7 +184,7 @@ def main():
             seen.add(f["t"]); prof.append((f, excess_profile(f["D"])))
         for f, e in prof:
             ms = fronts(e, e0, l0, r0)
-            ms["front_lead"] = ms["front_thr15"]
+            ms["front_lead"] = ms["front_L6"]
             recs.append({k: v for k, v in f.items() if k not in ("D", "magnet_on")} | ms | dict(gap_mm=(r0 - l0) * MM_PER_PX))
     df = pd.DataFrame(recs).sort_values(["series", "t"])
     bad = df.wall_mm.isna().sum()
@@ -213,10 +213,11 @@ def main():
         # PRIMARY whole-run velocity: peak advance rate = furthest the (3-point median smoothed) directional
         # front reached in the run / time taken to reach it. Unaffected by the wall (the clock stops when the
         # front stops) and by late back-drift as the reservoir spreads symmetrically; never negative.
-        fsm = g.front.rolling(3, center=True, min_periods=1).median().to_numpy(); tt = g.t.to_numpy()
-        kpk = int(np.argmax(fsm))
-        v_peak = max(fsm[kpk], 0.0) / tt[kpk] if tt[kpk] > 0 else 0.0
-        t_peak = tt[kpk]
+        def peak_rate(col):
+            fsm_ = g[col].rolling(3, center=True, min_periods=1).median().to_numpy(); tt_ = g.t.to_numpy()
+            k_ = int(np.argmax(fsm_))
+            return (max(fsm_[k_], 0.0) / tt_[k_] if tt_[k_] > 0 else 0.0), tt_[k_], float(fsm_[k_])
+        v_peak, t_peak, front_peak = peak_rate("front")
         resolved_run = bool((g.front_right > 0).any())     # plume reached the front level at some point in the run
         # an unresolved block's front never passed EDGE_SKIP in the run, so its peak rate is below EDGE_SKIP / run time;
         # enter it at that upper bound so slow blocks are not silently dropped from cell means
@@ -232,7 +233,7 @@ def main():
         vel.append(dict(day=g0.day, agarose=g0.agarose, arm=g0.arm, coating=g0.coating, series=s, resolved=resolved,
                         v_front=v_front, v_front_se=se, v_origin=v_origin, v_d90=v_d90, n_rise=n_rise,
                         v_full=v_full, resolved_full=resolved_full, n_full=n_full,
-                        v_peak=v_peak, t_peak=t_peak, front_peak=float(fsm[kpk]), resolved_run=resolved_run, v_bound=v_bound,
+                        v_peak=v_peak, t_peak=t_peak, front_peak=front_peak, resolved_run=resolved_run, v_bound=v_bound,
                         v_lead=v_lead, resolved_lead=res_lead,
                         front_max=g.front.max(), front_6h=g[g.t == g.t.max()].front.iloc[0],
                         wall_mm=wall,
@@ -253,19 +254,23 @@ def main():
     print("\ntime at which the front first came within", WALL_MARGIN, "mm of the wall (h):")
     print(V.groupby(["agarose", "arm"]).t_wall.agg(["mean", "min", "max"]).round(2).to_string())
 
-    print("\n=== threshold sensitivity: mean velocity (mm/h) by condition, and large/small ratio ===")
-    hdr = f"{'thr (L*)':>9s}" + "".join(f"{c:>14s}" for c in ["0.4% large", "0.4% small", "0.6% large", "controls"]) + f"{'L/S ratio':>11s}"
-    print(hdr)
+    print("\n=== front-level sensitivity: peak advance rate (mm/h, cell means) at each level; L/S = large/small (0.4%) ===")
+    cells = [("0.4%", "large", "COOH"), ("0.4%", "large", "PEG"), ("0.4%", "small", "COOH"), ("0.4%", "small", "PEG"),
+             ("0.6%", "large", "COOH"), ("0.6%", "large", "PEG")]
+    print(f"{'L*':>4s}" + "".join(f"{a[:3]+' '+b[0]+' '+c:>13s}" for a, b, c in cells) + f"{'ctrl max':>10s}{'L/S':>6s}{'unres':>7s}")
     for thr in THR_SENS:
-        col = f"front_thr{int(round(thr * L_SCALE))}"; vals = {}
+        col = f"front_L{int(thr)}"; vals = []
         for s_, g in df.groupby("series"):
-            g = g.sort_values("t"); wall_ = g.wall_mm.median(); hit_ = g[g[col] >= wall_ - WALL_MARGIN].t
-            w = g[g.t < min(T_RISE, hit_.min())] if len(hit_) and hit_.min() <= T_RISE else g[g.t <= T_RISE]
-            if len(w) >= 3: vals[s_] = (g.agarose.iloc[0], g.arm.iloc[0], stats.linregress(w.t, w[col]).slope)
-        vv = pd.DataFrame([dict(series=k, agarose=a, arm=b, v=c) for k, (a, b, c) in vals.items()])
-        def mv(ag, arm): x = vv[(vv.agarose == ag) & (vv.arm == arm)].v; return x.mean()
-        ctl = vv[vv.arm == "control"].v.mean()
-        print(f"{thr:9.0f}" + "".join(f"{mv(a, b):14.3f}" for a, b in [("0.4%", "large"), ("0.4%", "small"), ("0.6%", "large")]) + f"{ctl:14.3f}" + f"{mv('0.4%', 'large') / mv('0.4%', 'small'):11.2f}")
+            g = g.sort_values("t")
+            fsm_ = g[col].rolling(3, center=True, min_periods=1).median().to_numpy(); tt_ = g.t.to_numpy(); k_ = int(np.argmax(fsm_))
+            vals.append(dict(agarose=g.agarose.iloc[0], arm=g.arm.iloc[0], coating=g.coating.iloc[0],
+                             v=(max(fsm_[k_], 0.0) / tt_[k_] if tt_[k_] > 0 else 0.0), res=bool((fsm_ > 0).any())))
+        vv = pd.DataFrame(vals)
+        def mv(ag, arm, co=None):
+            x = vv[(vv.agarose == ag) & (vv.arm == arm) & ((vv.coating == co) if co else True)].v; return x.mean()
+        unres = int((~vv[vv.arm != "control"].res).sum())
+        print(f"{thr:4.0f}" + "".join(f"{mv(a, b, c):13.2f}" for a, b, c in cells)
+              + f"{vv[vv.arm == 'control'].v.max():10.2f}{mv('0.4%', 'large') / mv('0.4%', 'small'):6.2f}{unres:7d}")
 
     def grp(ag, arm): return V[(V.agarose == ag) & (V.arm == arm)].v_front.dropna()
     L4, S4, L6 = grp("0.4%", "large"), grp("0.4%", "small"), grp("0.6%", "large")
@@ -281,8 +286,10 @@ def main():
     print("\npeak advance rate by cell, unresolved blocks entered at their upper bound (0.1 mm/h); '<=' marks such cells:")
     for (ag, arm, co), gg in d.groupby(["agarose", "arm", "coating"]):
         print(f"  {ag} {arm:6s} {co:5s} {'<=' if (~gg.resolved_run).any() else '  '}{gg.v_bound.mean():.2f} ± {gg.v_bound.std():.2f}  (n={len(gg)}, unresolved {int((~gg.resolved_run).sum())})")
-    print("\nleading front (15 L*) by condition:")
-    print(V.groupby(["agarose", "arm"]).v_lead.agg(["mean", "std", "count"]).round(3).to_string())
+    print("\ncoating comparison per cell (Welch p on the peak advance rate):")
+    for ag, arm in [("0.4%", "large"), ("0.4%", "small"), ("0.6%", "large")]:
+        cc = d[(d.agarose == ag) & (d.arm == arm) & (d.coating == "COOH")]; pp = d[(d.agarose == ag) & (d.arm == arm) & (d.coating == "PEG")]
+        print(f"  {ag} {arm:6s} COOH {cc.v_peak.mean():.2f} PEG {pp.v_peak.mean():.2f} p={stats.ttest_ind(cc.v_peak, pp.v_peak, equal_var=False).pvalue:.2f}")
     print("controls, individually (mm/h):")
     for r in V[V.arm == "control"].itertuples(): print(f"  {r.series:26s} {r.v_front:+.3f}")
     for ag, co in [("0.4%", "COOH"), ("0.4%", "PEG"), ("0.6%", "COOH"), ("0.6%", "PEG")]:
