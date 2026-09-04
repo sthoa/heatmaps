@@ -24,10 +24,12 @@ Per frame (same field extraction as nav_metrics_compare / cross_day_compare):
       centroid  excess-weighted mean distance
       d90       distance containing 90 % of the excess
 
-Per series: velocity = slope of front vs time over the RISING phase (t <= T_RISE
-and before the front is within WALL_MARGIN of the block edge), by least squares.
-The block edge is only ~4.2 mm from the gap, so the plateau is at least partly
-the wall; velocities must come from before the wall is reached.
+Per series: velocity = least-squares slope of front vs time, in two windows --
+the rising phase (0-3 h) and the whole run (0-6 h) -- each stopping at the
+front's first arrival within WALL_MARGIN of the block edge.
+The block edge is only ~4.3 mm from the gap and the large-magnet front reaches
+it by ~3 h; fitting through the parked phase would return the wall distance
+divided by the run time (0.7 mm/h for every fast block) rather than a velocity.
 """
 from pathlib import Path
 
@@ -51,7 +53,8 @@ START_WIN = 1.2         # mm: a plume must begin within this distance of the gap
 BRIDGE = 0.5            # mm: dips below threshold shorter than this do not end the plume
 THR_SENS = (15.0, 20.0, 25.0, 30.0, 35.0)   # thresholds for the sensitivity table
 SMOOTH_PX = 9           # moving average over ~0.2 mm before walking the front
-T_RISE = 3.0            # h; curves plateau after this
+T_RISE = 3.0            # h; short window (the rising phase)
+T_FULL = 6.0            # h; whole run. Both windows stop at the front's first arrival at the wall
 WALL_MARGIN = 0.4       # mm; drop points once the front is this close to the block edge
 MM_PER_PX = (A23.EXTENT_MM[1] - A23.EXTENT_MM[0]) / (A23.WARP - 2 * A23.MARGIN)
 OUT = Path(__file__).parent / "outputs"
@@ -190,16 +193,18 @@ def main():
         g = g.sort_values("t")
         wall = g.wall_mm.median()
 
-        def fit(col, side_col):
+        def fit(col, side_col, tmax=T_RISE):
+            # only while the front is still free to move: stop at its first arrival at the wall
             hit = g[g[col] >= wall - WALL_MARGIN].t
-            t_end = min(T_RISE, hit.min()) if len(hit) else T_RISE
-            rise = g[g.t < t_end] if len(hit) and hit.min() <= T_RISE else g[g.t <= t_end]
+            t_end = min(tmax, hit.min()) if len(hit) else tmax
+            rise = g[g.t < t_end] if len(hit) and hit.min() <= tmax else g[g.t <= t_end]
             if len(rise) < 3:
                 return np.nan, np.nan, len(rise), False
             v, b, rr, p_, se = stats.linregress(rise.t, rise[col])
             return v, se, len(rise), bool((rise[side_col] > 0).any())
 
         v_front, se, n_rise, resolved = fit("front", "front_right")
+        v_full, se_full, n_full, resolved_full = fit("front", "front_right", T_FULL)
         # leading-edge (15 L*) front: the magnet-side leading front alone tells whether it resolved
         g["_lead_right"] = np.nan
         v_lead, se_l, n_lead, res_lead = fit("front_lead", "front_lead")
@@ -210,6 +215,7 @@ def main():
         g0 = g.iloc[0]
         vel.append(dict(day=g0.day, agarose=g0.agarose, arm=g0.arm, coating=g0.coating, series=s, resolved=resolved,
                         v_front=v_front, v_front_se=se, v_origin=v_origin, v_d90=v_d90, n_rise=n_rise,
+                        v_full=v_full, resolved_full=resolved_full, n_full=n_full,
                         v_lead=v_lead, resolved_lead=res_lead,
                         front_max=g.front.max(), front_6h=g[g.t == g.t.max()].front.iloc[0],
                         wall_mm=wall,
@@ -253,7 +259,7 @@ def main():
     print(f"0.4% vs 0.6%, large:    {L4.mean():.3f} vs {L6.mean():.3f} mm/h  ratio {L4.mean()/L6.mean():.2f}   "
           f"Welch p={stats.ttest_ind(L4, L6, equal_var=False).pvalue:.4f}")
     print("\nper-series velocities (mm/h): bulk front (25 L*) and leading front (15 L*); resolved = plume reached the level within the window")
-    print(V[["agarose", "arm", "coating", "series", "v_front", "resolved", "v_lead", "resolved_lead", "n_rise"]].round(2).to_string(index=False))
+    print(V[["agarose", "arm", "coating", "series", "v_front", "resolved", "v_full", "resolved_full", "n_rise", "n_full"]].round(2).to_string(index=False))
     print("\nleading front (15 L*) by condition:")
     print(V.groupby(["agarose", "arm"]).v_lead.agg(["mean", "std", "count"]).round(3).to_string())
     print("controls, individually (mm/h):")
